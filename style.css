@@ -935,6 +935,57 @@ textarea {
     border-bottom-color: var(--primary);
 }
 
+/* ============================================
+   CORREÇÕES PARA MIUI/REDMI
+   ============================================ */
+
+/* Correções de layout para MIUI */
+.miui-device .container {
+    min-height: 100vh;
+    min-height: -webkit-fill-available;
+}
+
+.miui-device .table-wrapper {
+    -webkit-overflow-scrolling: touch !important;
+    -ms-overflow-style: touch !important;
+}
+
+.miui-device input,
+.miui-device textarea,
+.miui-device select {
+    -webkit-appearance: none;
+    appearance: none;
+    font-size: 16px !important;
+    min-height: 48px !important;
+}
+
+.miui-device .mobile-input,
+.miui-device .mobile-textarea {
+    font-size: 16px !important;
+    min-height: 48px !important;
+}
+
+.miui-device .btn,
+.miui-device button {
+    min-height: 48px !important;
+    min-width: 48px !important;
+}
+
+/* Prevenir zoom indesejado no MIUI */
+@media screen and (max-width: 768px) {
+    .miui-device input,
+    .miui-device textarea,
+    .miui-device select {
+        font-size: 16px !important;
+    }
+}
+
+/* Correção para teclado virtual */
+.miui-device input:focus,
+.miui-device textarea:focus {
+    transform: translateZ(0);
+}
+
 /* Para tablets */
 @media (max-width: 1024px) {
     .container {
@@ -1406,10 +1457,6 @@ textarea {
 
 /* Prevenir zoom em iOS */
 @media screen and (max-width: 768px) {
-    input, textarea, select {
-        font-size: 16px !important;
-    }
-    
     input[type="date"],
     input[type="time"],
     input[type="datetime-local"],

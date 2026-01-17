@@ -1,5 +1,6 @@
 class InstagramReportSystem {
     constructor() {
+        this.isMIUI = this.detectMIUI();
         this.currentWeek = this.getCurrentWeek();
         this.data = {
             attendance: [],
@@ -18,10 +19,24 @@ class InstagramReportSystem {
         this.init();
     }
     
+    detectMIUI() {
+        const ua = navigator.userAgent;
+        return ua.includes('MiuiBrowser') || 
+               ua.includes('XiaoMi') || 
+               ua.includes('Redmi') ||
+               ua.includes('MIUI') ||
+               /xiaomi/i.test(ua);
+    }
+    
     init() {
         this.cacheElements();
         this.setupEventListeners();
         this.detectDevice();
+        
+        if (this.isMIUI) {
+            this.applyMIUIFixes();
+        }
+        
         this.addMobileStyles();
         this.loadSavedData();
         this.updateUI();
@@ -29,6 +44,34 @@ class InstagramReportSystem {
         this.setupMobileFeatures();
         
         this.showNotification('Sistema carregado. Bem-vinda, Iandra!', 'success');
+    }
+    
+    applyMIUIFixes() {
+        console.log('Aplicando correções para MIUI/Redmi');
+        
+        document.body.classList.add('miui-device');
+        
+        const style = document.createElement('style');
+        style.textContent = `
+            .miui-device input,
+            .miui-device textarea,
+            .miui-device select {
+                -webkit-user-modify: read-write-plaintext-only !important;
+                user-select: text !important;
+                -webkit-user-select: text !important;
+            }
+            
+            .miui-device .table-wrapper {
+                -webkit-overflow-scrolling: touch !important;
+            }
+            
+            .miui-device .mobile-input,
+            .miui-device .mobile-textarea {
+                min-height: 48px !important;
+                font-size: 16px !important;
+            }
+        `;
+        document.head.appendChild(style);
     }
     
     cacheElements() {
@@ -117,6 +160,36 @@ class InstagramReportSystem {
         this.setupCharacterCounters();
         this.setupTabNavigation();
         this.setupAutoSave();
+        
+        if (this.isMIUI) {
+            this.setupMIUITouchFix();
+        }
+    }
+    
+    setupMIUITouchFix() {
+        document.addEventListener('touchstart', (e) => {
+            const target = e.target;
+            
+            if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') {
+                target.style.fontSize = '16px';
+                
+                setTimeout(() => {
+                    target.focus();
+                    if (target.setSelectionRange) {
+                        target.setSelectionRange(target.value.length, target.value.length);
+                    }
+                }, 50);
+            }
+        }, { passive: true });
+        
+        let lastTap = 0;
+        document.addEventListener('touchend', (e) => {
+            const now = Date.now();
+            if (now - lastTap < 300) {
+                e.preventDefault();
+            }
+            lastTap = now;
+        }, { passive: false });
     }
     
     setupMobileFeatures() {
@@ -127,12 +200,6 @@ class InstagramReportSystem {
             this.detectDevice();
             this.renderTablesForDevice();
         });
-        
-        document.addEventListener('touchstart', (e) => {
-            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
-                e.target.style.fontSize = '16px';
-            }
-        }, { passive: true });
     }
     
     setupMobileContextMenu() {
@@ -189,9 +256,17 @@ class InstagramReportSystem {
     
     improveTouchInputs() {
         if (this.isMobile) {
+            const minSize = this.isMIUI ? '48px' : '44px';
+            
             document.querySelectorAll('input, textarea, select, button').forEach(element => {
-                element.style.minHeight = '44px';
-                element.style.minWidth = '44px';
+                element.style.minHeight = minSize;
+                element.style.minWidth = minSize;
+                element.style.touchAction = 'manipulation';
+            });
+            
+            document.querySelectorAll('input[type="number"], input[type="date"]').forEach(input => {
+                input.style.fontSize = '16px';
+                input.setAttribute('inputmode', 'numeric');
             });
         }
     }
@@ -271,6 +346,12 @@ class InstagramReportSystem {
                     transform: scale(4);
                     opacity: 0;
                 }
+            }
+            
+            /* MIUI specific fixes */
+            .miui-input-fix:focus {
+                border-color: #2c5282 !important;
+                box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.3) !important;
             }
         `;
         document.head.appendChild(style);
@@ -490,31 +571,32 @@ class InstagramReportSystem {
         this.elements.attendanceBody.innerHTML = this.data.attendance.map((item, index) => `
             <tr data-index="${index}">
                 <td>
-                    <input type="date" class="date-input" value="${item.date}" 
+                    <input type="date" class="date-input miui-input-fix" value="${item.date}" 
                            onchange="instagramReport.updateAttendanceField(${index}, 'date', this.value)">
                 </td>
                 <td>
-                    <input type="number" min="0" value="${item.messages}" 
+                    <input type="number" min="0" value="${item.messages}" class="miui-input-fix"
                            onchange="instagramReport.updateAttendanceField(${index}, 'messages', this.value)">
                 </td>
                 <td>
-                    <input type="number" min="0" value="${item.replies}" 
+                    <input type="number" min="0" value="${item.replies}" class="miui-input-fix"
                            onchange="instagramReport.updateAttendanceField(${index}, 'replies', this.value)">
                 </td>
                 <td>
-                    <input type="number" min="0" value="${item.reservations}" 
+                    <input type="number" min="0" value="${item.reservations}" class="miui-input-fix"
                            onchange="instagramReport.updateAttendanceField(${index}, 'reservations', this.value)">
                 </td>
                 <td>
-                    <input type="number" min="0" value="${item.budgets}" 
+                    <input type="number" min="0" value="${item.budgets}" class="miui-input-fix"
                            onchange="instagramReport.updateAttendanceField(${index}, 'budgets', this.value)">
                 </td>
                 <td>
-                    <input type="number" min="0" value="${item.lost}" 
+                    <input type="number" min="0" value="${item.lost}" class="miui-input-fix"
                            onchange="instagramReport.updateAttendanceField(${index}, 'lost', this.value)">
                 </td>
                 <td>
                     <textarea onchange="instagramReport.updateAttendanceField(${index}, 'observations', this.value)"
+                              class="miui-input-fix"
                               placeholder="Observações...">${item.observations}</textarea>
                 </td>
                 <td>
@@ -542,31 +624,32 @@ class InstagramReportSystem {
         this.elements.contentBody.innerHTML = this.data.content.map((item, index) => `
             <tr data-index="${index}">
                 <td>
-                    <input type="date" class="date-input" value="${item.date}" 
+                    <input type="date" class="date-input miui-input-fix" value="${item.date}" 
                            onchange="instagramReport.updateContentField(${index}, 'date', this.value)">
                 </td>
                 <td>
-                    <input type="number" min="0" value="${item.stories}" 
+                    <input type="number" min="0" value="${item.stories}" class="miui-input-fix"
                            onchange="instagramReport.updateContentField(${index}, 'stories', this.value)">
                 </td>
                 <td>
-                    <input type="number" min="0" value="${item.reels}" 
+                    <input type="number" min="0" value="${item.reels}" class="miui-input-fix"
                            onchange="instagramReport.updateContentField(${index}, 'reels', this.value)">
                 </td>
                 <td>
-                    <input type="number" min="0" value="${item.storyViews}" 
+                    <input type="number" min="0" value="${item.storyViews}" class="miui-input-fix"
                            onchange="instagramReport.updateContentField(${index}, 'storyViews', this.value)">
                 </td>
                 <td>
-                    <input type="number" min="0" value="${item.reelViews}" 
+                    <input type="number" min="0" value="${item.reelViews}" class="miui-input-fix"
                            onchange="instagramReport.updateContentField(${index}, 'reelViews', this.value)">
                 </td>
                 <td>
-                    <input type="number" min="0" max="100" step="0.1" value="${item.engagement}" 
+                    <input type="number" min="0" max="100" step="0.1" value="${item.engagement}" class="miui-input-fix"
                            onchange="instagramReport.updateContentField(${index}, 'engagement', this.value)">
                 </td>
                 <td>
                     <textarea onchange="instagramReport.updateContentField(${index}, 'observations', this.value)"
+                              class="miui-input-fix"
                               placeholder="Observações...">${item.observations}</textarea>
                 </td>
                 <td>
@@ -608,36 +691,36 @@ class InstagramReportSystem {
                         <span class="label">Mensagens:</span>
                         <input type="number" value="${item.messages}" 
                                onchange="instagramReport.updateAttendanceField(${index}, 'messages', this.value)"
-                               class="mobile-input">
+                               class="mobile-input miui-input-fix">
                     </div>
                     <div class="mobile-row">
                         <span class="label">Respostas:</span>
                         <input type="number" value="${item.replies}" 
                                onchange="instagramReport.updateAttendanceField(${index}, 'replies', this.value)"
-                               class="mobile-input">
+                               class="mobile-input miui-input-fix">
                     </div>
                     <div class="mobile-row">
                         <span class="label">Reservas:</span>
                         <input type="number" value="${item.reservations}" 
                                onchange="instagramReport.updateAttendanceField(${index}, 'reservations', this.value)"
-                               class="mobile-input">
+                               class="mobile-input miui-input-fix">
                     </div>
                     <div class="mobile-row">
                         <span class="label">Orçamentos:</span>
                         <input type="number" value="${item.budgets}" 
                                onchange="instagramReport.updateAttendanceField(${index}, 'budgets', this.value)"
-                               class="mobile-input">
+                               class="mobile-input miui-input-fix">
                     </div>
                     <div class="mobile-row">
                         <span class="label">Perdidos:</span>
                         <input type="number" value="${item.lost}" 
                                onchange="instagramReport.updateAttendanceField(${index}, 'lost', this.value)"
-                               class="mobile-input">
+                               class="mobile-input miui-input-fix">
                     </div>
                     <div class="mobile-row-full">
                         <span class="label">Observações:</span>
                         <textarea onchange="instagramReport.updateAttendanceField(${index}, 'observations', this.value)"
-                                  class="mobile-textarea" placeholder="Adicione observações...">${item.observations}</textarea>
+                                  class="mobile-textarea miui-input-fix" placeholder="Adicione observações...">${item.observations}</textarea>
                     </div>
                 </div>
             </div>
@@ -676,36 +759,36 @@ class InstagramReportSystem {
                         <span class="label">Stories:</span>
                         <input type="number" value="${item.stories}" 
                                onchange="instagramReport.updateContentField(${index}, 'stories', this.value)"
-                               class="mobile-input">
+                               class="mobile-input miui-input-fix">
                     </div>
                     <div class="mobile-row">
                         <span class="label">Reels:</span>
                         <input type="number" value="${item.reels}" 
                                onchange="instagramReport.updateContentField(${index}, 'reels', this.value)"
-                               class="mobile-input">
+                               class="mobile-input miui-input-fix">
                     </div>
                     <div class="mobile-row">
                         <span class="label">Views Stories:</span>
                         <input type="number" value="${item.storyViews}" 
                                onchange="instagramReport.updateContentField(${index}, 'storyViews', this.value)"
-                               class="mobile-input">
+                               class="mobile-input miui-input-fix">
                     </div>
                     <div class="mobile-row">
                         <span class="label">Views Reels:</span>
                         <input type="number" value="${item.reelViews}" 
                                onchange="instagramReport.updateContentField(${index}, 'reelViews', this.value)"
-                               class="mobile-input">
+                               class="mobile-input miui-input-fix">
                     </div>
                     <div class="mobile-row">
                         <span class="label">Engajamento:</span>
                         <input type="number" value="${item.engagement}" 
                                onchange="instagramReport.updateContentField(${index}, 'engagement', this.value)"
-                               class="mobile-input">
+                               class="mobile-input miui-input-fix">
                     </div>
                     <div class="mobile-row-full">
                         <span class="label">Observações:</span>
                         <textarea onchange="instagramReport.updateContentField(${index}, 'observations', this.value)"
-                                  class="mobile-textarea" placeholder="Adicione observações...">${item.observations}</textarea>
+                                  class="mobile-textarea miui-input-fix" placeholder="Adicione observações...">${item.observations}</textarea>
                     </div>
                 </div>
             </div>
@@ -1353,9 +1436,18 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
         
+        // Correção específica para MIUI
+        const isMIUI = /miui|redmi|xiaomi/i.test(navigator.userAgent);
+        
         document.addEventListener('touchstart', (e) => {
             if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
                 e.target.style.fontSize = '16px';
+                
+                if (isMIUI) {
+                    setTimeout(() => {
+                        e.target.focus();
+                    }, 50);
+                }
             }
         }, { passive: true });
     }
