@@ -2,393 +2,974 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
-    <title>Relatório Instagram | Material para Construção</title>
-    <link rel="stylesheet" href="/style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer">
-    <meta name="theme-color" content="#1a365d">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Relatório Instagram - N. Sra. da Conceição</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* --- DESIGN SYSTEM & VARIAVEIS --- */
+        :root {
+            /* Cores da Marca */
+            --primary-dark: #1a365d;
+            --primary: #2c5282;
+            --primary-light: #4299e1;
+            
+            /* Ação e Status */
+            --accent: #dd6b20;
+            --accent-light: #ed8936;
+            --success: #38a169;
+            --danger: #e53e3e;
+            --warning: #d69e2e;
+            
+            /* Neutros */
+            --bg-body: #f7fafc;
+            --bg-card: #ffffff;
+            --text-main: #2d3748;
+            --text-muted: #718096;
+            --border: #e2e8f0;
+
+            /* Sombras */
+            --shadow-sm: 0 1px 3px 0 rgba(0,0,0,0.1), 0 1px 2px 0 rgba(0,0,0,0.06);
+            --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
+        }
+
+        /* --- RESET & BASE --- */
+        * { box-sizing: border-box; margin: 0; padding: 0; outline: none; -webkit-tap-highlight-color: transparent; }
+        
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            line-height: 1.5;
+            padding-bottom: 80px; /* Espaço para FAB ou Tabbar mobile se houver */
+        }
+
+        /* --- TIPOGRAFIA --- */
+        h1, h2, h3, h4 { color: var(--primary-dark); font-weight: 700; }
+        .text-sm { font-size: 0.875rem; }
+        .text-xs { font-size: 0.75rem; }
+        .text-center { text-align: center; }
+        .font-bold { font-weight: 600; }
+
+        /* --- LAYOUT --- */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem;
+        }
+
+        .header {
+            background: var(--bg-card);
+            padding: 1rem;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .logo-circle {
+            width: 48px;
+            height: 48px;
+            background: var(--primary);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.6rem;
+            font-weight: bold;
+            line-height: 1;
+            text-align: center;
+        }
+
+        /* --- CONTROLES DE DATA --- */
+        .week-selector {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        input[type="week"] {
+            padding: 0.5rem;
+            border: 1px solid var(--border);
+            border-radius: 0.375rem;
+            font-family: inherit;
+            color: var(--primary-dark);
+            font-weight: 600;
+        }
+
+        /* --- ABAS DE NAVEGAÇÃO --- */
+        .tabs {
+            display: flex;
+            gap: 0.5rem;
+            overflow-x: auto;
+            padding-bottom: 0.5rem;
+            margin-bottom: 1.5rem;
+            scrollbar-width: none; /* Firefox */
+        }
+        .tabs::-webkit-scrollbar { display: none; }
+
+        .tab-btn {
+            background: white;
+            border: 1px solid var(--border);
+            padding: 0.75rem 1.25rem;
+            border-radius: 2rem;
+            white-space: nowrap;
+            color: var(--text-muted);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .tab-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+            box-shadow: var(--shadow-sm);
+        }
+
+        /* --- CARDS E CONTEÚDO --- */
+        .content-section { display: none; animation: fadeIn 0.3s ease; }
+        .content-section.active { display: block; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .card {
+            background: var(--bg-card);
+            border-radius: 0.75rem;
+            padding: 1.25rem;
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 1.5rem;
+            border: 1px solid var(--border);
+        }
+
+        /* --- DASHBOARD STATS --- */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1rem;
+            border-radius: 0.75rem;
+            border: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 4px; height: 100%;
+            background: var(--primary-light);
+        }
+
+        .stat-label { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+        .stat-value { font-size: 1.5rem; font-weight: 700; color: var(--primary-dark); }
+        .stat-sub { font-size: 0.75rem; color: var(--success); display: flex; align-items: center; gap: 0.25rem; }
+
+        /* --- FORMULÁRIOS & INPUTS --- */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .form-group { margin-bottom: 1rem; }
+        .form-group label { display: block; font-size: 0.875rem; color: var(--text-muted); margin-bottom: 0.25rem; }
+        
+        .input-control {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            transition: border-color 0.2s;
+            background: #fff;
+        }
+        
+        .input-control:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.2); }
+        textarea.input-control { resize: vertical; min-height: 80px; }
+
+        /* --- TABELAS RESPONSIVAS (CARD VIEW NO MOBILE) --- */
+        .data-list { display: flex; flex-direction: column; gap: 1rem; }
+        
+        .data-item {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .data-header { display: flex; justify-content: space-between; align-items: center; width: 100%; grid-column: 1 / -1; border-bottom: 1px solid #f0f0f0; padding-bottom: 0.5rem; margin-bottom: 0.5rem; }
+        .data-date { font-weight: 600; color: var(--primary); }
+        
+        .data-metrics { 
+            display: grid; 
+            grid-template-columns: repeat(2, 1fr); 
+            gap: 0.5rem; 
+            font-size: 0.875rem; 
+            grid-column: 1 / -1;
+        }
+        
+        .metric-pill { background: #f7fafc; padding: 0.25rem 0.5rem; border-radius: 4px; color: var(--text-muted); }
+        .metric-pill span { color: var(--text-main); font-weight: 600; }
+
+        /* --- BOTÕES --- */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.9rem;
+        }
+
+        .btn-primary { background: var(--primary); color: white; width: 100%; }
+        .btn-primary:active { transform: scale(0.98); }
+        .btn-danger { background: #fff5f5; color: var(--danger); border: 1px solid #fed7d7; }
+        .btn-icon { padding: 0.5rem; border-radius: 50%; width: 36px; height: 36px; }
+        
+        .fab {
+            position: fixed;
+            bottom: 2rem;
+            right: 1.5rem;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: var(--accent);
+            color: white;
+            box-shadow: 0 4px 12px rgba(221, 107, 32, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            z-index: 100;
+            cursor: pointer;
+        }
+
+        /* --- NOTIFICATIONS --- */
+        #toast-container {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        .toast {
+            background: var(--text-main);
+            color: white;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            box-shadow: var(--shadow-md);
+            animation: slideIn 0.3s ease;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .toast.success { border-left: 4px solid var(--success); }
+        .toast.error { border-left: 4px solid var(--danger); }
+        
+        @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
+
+        /* --- MIUI & MOBILE CORRECTIONS --- */
+        .miui-device input, .miui-device button, .miui-device select {
+            min-height: 48px !important; /* Touch target fix */
+            font-size: 16px !important; /* Prevent zoom */
+        }
+        .miui-device .input-control:focus {
+            /* Force redraw fix */
+            transform: translateZ(0); 
+        }
+
+        /* --- DESKTOP TWEAKS --- */
+        @media (min-width: 768px) {
+            .stats-grid { grid-template-columns: repeat(4, 1fr); }
+            .data-item { grid-template-columns: 150px 1fr auto; }
+            .data-header { grid-column: 1; border: none; margin: 0; padding: 0; }
+            .data-metrics { grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)); grid-column: 2; }
+            .btn-primary { width: auto; }
+        }
+
+        /* --- PRINT STYLES (Hide UI) --- */
+        @media print {
+            body * { visibility: hidden; }
+            #printable-area, #printable-area * { visibility: visible; }
+            #printable-area { position: absolute; left: 0; top: 0; width: 100%; }
+        }
+    </style>
 </head>
 <body>
+
+    <div id="toast-container"></div>
+
     <div class="container">
+        <!-- HEADER -->
         <header class="header">
-            <div class="branding">
-                <div class="logo">
-                    <div class="logo-circle">
-                        <div class="logo-text">
-                            <span>Insc</span>
-                            <span>Nossa Sra. da</span>
-                            <span>Conceição</span>
-                        </div>
-                    </div>
+            <div class="brand">
+                <div class="logo-circle">
+                    <span>INSC</span>
+                    <span>NSC</span>
                 </div>
-                <div class="company-info">
-                    <h1>MATERIAL PARA CONSTRUÇÃO</h1>
-                    <div class="user-welcome">
-                        <p class="desktop-only">Relatório Semanal - Instagram</p>
-                        <p class="mobile-only">Relatório Instagram</p>
-                        <p class="user-name">Usuária: <strong>Iandra Jamile</strong> <span class="desktop-only">| Marketing</span></p>
-                    </div>
+                <div>
+                    <h2 class="text-sm">Mat. Construção</h2>
+                    <h1 style="font-size: 1.25rem;">Nossa Sra. da Conceição</h1>
                 </div>
             </div>
-            
-            <div class="mobile-only mobile-tab-nav">
-                <div class="tabs">
-                    <button class="tab active" data-tab="attendance">
-                        <i class="fas fa-comments"></i> <span>Atendimento</span>
-                    </button>
-                    <button class="tab" data-tab="content">
-                        <i class="fas fa-photo-video"></i> <span>Conteúdo</span>
-                    </button>
-                </div>
-            </div>
-            
-            <div class="controls">
-                <div class="week-selector">
-                    <label for="week">Semana:</label>
-                    <input type="week" id="week" aria-label="Selecione a semana" class="miui-input-fix">
-                </div>
-                <div class="quick-actions">
-                    <button id="newWeek" class="btn btn-outline mobile-compact">
-                        <i class="fas fa-calendar-plus"></i> <span class="desktop-only">Nova Semana</span>
-                        <span class="mobile-only">Nova</span>
-                    </button>
-                    <button id="quickSave" class="btn btn-primary mobile-compact">
-                        <i class="fas fa-save"></i> <span class="desktop-only">Salvar</span>
-                    </button>
-                </div>
+            <div class="week-selector">
+                <label for="weekPicker" class="text-sm text-muted">Semana:</label>
+                <input type="week" id="weekPicker">
+                <button class="btn btn-icon" onclick="app.exportData()" title="Exportar JSON">
+                    <i class="fas fa-file-export text-muted"></i>
+                </button>
             </div>
         </header>
 
-        <main class="main-content">
-            <div class="tabs-container desktop-only">
-                <div class="tabs">
-                    <button class="tab active" data-tab="attendance">
-                        <i class="fas fa-comments"></i> Atendimento - Direct & Mensagens
-                    </button>
-                    <button class="tab" data-tab="content">
-                        <i class="fas fa-photo-video"></i> Conteúdo Postado (Story & Reels)
-                    </button>
-                </div>
-            </div>
-
-            <div class="tab-content active" id="attendance-tab">
-                <div class="section-header">
-                    <h2><i class="fas fa-headset"></i> <span class="desktop-only">ATENDIMENTO - </span>DIRECT & MENSAGENS</h2>
-                    <div class="action-buttons">
-                        <button id="addAttendanceRow" class="btn btn-success">
-                            <i class="fas fa-plus"></i> <span class="desktop-only">Adicionar Dia</span>
-                            <span class="mobile-only">Adicionar</span>
-                        </button>
-                        <button id="duplicateLastDay" class="btn btn-outline desktop-only">
-                            <i class="fas fa-copy"></i> Duplicar Último
-                        </button>
-                    </div>
-                </div>
-                
-                <div class="mobile-only table-scroll-indicator">
-                    <i class="fas fa-arrows-left-right"></i> Deslize para ver mais
-                </div>
-                
-                <div class="table-wrapper">
-                    <table id="attendanceTable" class="desktop-only">
-                        <thead>
-                            <tr>
-                                <th>Dia</th>
-                                <th><i class="fas fa-inbox"></i> <span class="desktop-only">Mensagens</span><span class="mobile-only">Msg</span></th>
-                                <th><i class="fas fa-reply"></i> <span class="desktop-only">Respostas</span><span class="mobile-only">Resp</span></th>
-                                <th><i class="fas fa-calendar-check"></i> <span class="desktop-only">Reservas</span><span class="mobile-only">Res</span></th>
-                                <th><i class="fas fa-file-invoice-dollar"></i> <span class="desktop-only">Orçamentos</span><span class="mobile-only">Orç</span></th>
-                                <th><i class="fas fa-times-circle"></i> <span class="desktop-only">Perdidos</span><span class="mobile-only">Per</span></th>
-                                <th><i class="fas fa-sticky-note"></i> <span class="desktop-only">Observações</span><span class="mobile-only">Obs</span></th>
-                                <th>Ações</th>
-                            </tr>
-                        </thead>
-                        <tbody id="attendanceBody">
-                            <tr class="empty-state" id="attendanceEmpty">
-                                <td colspan="8">
-                                    <div class="empty-message">
-                                        <i class="fas fa-inbox fa-2x"></i>
-                                        <p>Nenhum dado de atendimento adicionado</p>
-                                        <button class="btn btn-success" onclick="instagramReport.addAttendanceRow()">
-                                            <i class="fas fa-plus"></i> Adicionar Primeiro Dia
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                        </tbody>
-                        <tfoot>
-                            <tr class="totals-row">
-                                <td><strong>Totais:</strong></td>
-                                <td id="totalMessages">0</td>
-                                <td id="totalReplies">0</td>
-                                <td id="totalReservations">0</td>
-                                <td id="totalBudgets">0</td>
-                                <td id="totalLost">0</td>
-                                <td colspan="2">
-                                    <div class="conversion-rate">
-                                        <span>Conversão:</span>
-                                        <span id="conversionRate">0%</span>
-                                    </div>
-                                </td>
-                            </tr>
-                        </tfoot>
-                    </table>
-                    
-                    <div id="attendanceMobile" class="mobile-only">
-                    </div>
-                </div>
-                
-                <div class="table-legend desktop-only">
-                    <div class="legend-item">
-                        <span class="legend-color" style="background-color: #e8f4fc"></span>
-                        <span>Mensagens recebidas: <strong id="legendMessages">0</strong></span>
-                    </div>
-                    <div class="legend-item">
-                        <span class="legend-color" style="background-color: #d4f1d4"></span>
-                        <span>Clientes em potencial: <strong id="legendPotential">0</strong></span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="tab-content" id="content-tab">
-                <div class="section-header">
-                    <h2><i class="fas fa-chart-line"></i> <span class="desktop-only">CONTEÚDO POSTADO </span>(STORY & REELS)</h2>
-                    <div class="action-buttons">
-                        <button id="addContentRow" class="btn btn-success">
-                            <i class="fas fa-plus"></i> <span class="desktop-only">Adicionar Dia</span>
-                            <span class="mobile-only">Adicionar</span>
-                        </button>
-                        <button id="addMultipleDays" class="btn btn-outline desktop-only">
-                            <i class="fas fa-calendar-week"></i> Adicionar Semana
-                        </button>
-                    </div>
-                </div>
-                
-                <div class="mobile-only table-scroll-indicator">
-                    <i class="fas fa-arrows-left-right"></i> Deslize para ver mais
-                </div>
-                
-                <div class="table-wrapper">
-                    <table id="contentTable" class="desktop-only">
-                        <thead>
-                            <tr>
-                                <th>Dia</th>
-                                <th><i class="fas fa-image"></i> <span class="desktop-only">Stories</span><span class="mobile-only">Stor</span></th>
-                                <th><i class="fas fa-play-circle"></i> <span class="desktop-only">Reels</span><span class="mobile-only">Reel</span></th>
-                                <th><i class="fas fa-eye"></i> <span class="desktop-only">Views S</span><span class="mobile-only">V.S</span></th>
-                                <th><i class="fas fa-eye"></i> <span class="desktop-only">Views R</span><span class="mobile-only">V.R</span></th>
-                                <th><i class="fas fa-heart"></i> <span class="desktop-only">Engaj.</span><span class="mobile-only">Eng</span></th>
-                                <th><i class="fas fa-sticky-note"></i> <span class="desktop-only">Obs.</span><span class="mobile-only">Obs</span></th>
-                                <th>Ações</th>
-                            </tr>
-                        </thead>
-                        <tbody id="contentBody">
-                            <tr class="empty-state" id="contentEmpty">
-                                <td colspan="8">
-                                    <div class="empty-message">
-                                        <i class="fas fa-photo-video fa-2x"></i>
-                                        <p>Nenhum dado de conteúdo adicionado</p>
-                                        <button class="btn btn-success" onclick="instagramReport.addContentRow()">
-                                            <i class="fas fa-plus"></i> Adicionar Primeiro Dia
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                        </tbody>
-                        <tfoot>
-                            <tr class="totals-row">
-                                <td><strong>Totais:</strong></td>
-                                <td id="totalStories">0</td>
-                                <td id="totalReels">0</td>
-                                <td id="totalStoryViews">0</td>
-                                <td id="totalReelViews">0</td>
-                                <td id="avgEngagement">0%</td>
-                                <td colspan="2">
-                                    <div class="performance-indicator">
-                                        <span>Perf.:</span>
-                                        <span id="performanceLevel" class="performance-good">Boa</span>
-                                    </div>
-                                </td>
-                            </tr>
-                        </tfoot>
-                    </table>
-                    
-                    <div id="contentMobile" class="mobile-only">
-                    </div>
-                </div>
-            </div>
-
-            <div class="dashboard">
-                <div class="stats-cards">
-                    <div class="stat-card">
-                        <div class="stat-icon" style="background-color: #e3f2fd;">
-                            <i class="fas fa-inbox" style="color: #1976d2;"></i>
-                        </div>
-                        <div class="stat-info">
-                            <div class="stat-value" id="statMessages">0</div>
-                            <div class="stat-label">Mensagens</div>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon" style="background-color: #f3e5f5;">
-                            <i class="fas fa-reply" style="color: #7b1fa2;"></i>
-                        </div>
-                        <div class="stat-info">
-                            <div class="stat-value" id="statReplies">0</div>
-                            <div class="stat-label">Respostas</div>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon" style="background-color: #e8f5e9;">
-                            <i class="fas fa-user-check" style="color: #388e3c;"></i>
-                        </div>
-                        <div class="stat-info">
-                            <div class="stat-value" id="statPotential">0</div>
-                            <div class="stat-label">Clientes</div>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon" style="background-color: #fff3e0;">
-                            <i class="fas fa-chart-line" style="color: #f57c00;"></i>
-                        </div>
-                        <div class="stat-info">
-                            <div class="stat-value" id="statEngagement">0%</div>
-                            <div class="stat-label">Engajamento</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="summary-section">
-                    <div class="highlights-card">
-                        <h3><i class="fas fa-star"></i> DESTAQUES</h3>
-                        <div class="highlights-form">
-                            <div class="form-group">
-                                <label for="bestStory">
-                                    <i class="fas fa-crown"></i> Melhor Story:
-                                </label>
-                                <div class="input-with-counter">
-                                    <input type="text" id="bestStory" maxlength="200" class="miui-input-fix"
-                                           placeholder="Story com mais visualizações">
-                                    <span class="char-counter">0/200</span>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label for="bestReel">
-                                    <i class="fas fa-trophy"></i> Melhor Reel:
-                                </label>
-                                <div class="input-with-counter">
-                                    <input type="text" id="bestReel" maxlength="200" class="miui-input-fix"
-                                           placeholder="Reel com melhor desempenho">
-                                    <span class="char-counter">0/200</span>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label for="suggestions">
-                                    <i class="fas fa-lightbulb"></i> Sugestões:
-                                </label>
-                                <div class="input-with-counter">
-                                    <textarea id="suggestions" maxlength="500" class="miui-input-fix"
-                                              placeholder="Ideias para próxima semana..."></textarea>
-                                    <span class="char-counter">0/500</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="insights-card">
-                        <h3><i class="fas fa-chart-pie"></i> INSIGHTS</h3>
-                        <div class="insights-content">
-                            <div class="insight-item">
-                                <div class="insight-icon">
-                                    <i class="fas fa-bullseye"></i>
-                                </div>
-                                <div class="insight-text">
-                                    <h4>Meta: 5% engajamento</h4>
-                                    <p>Foco principal esta semana</p>
-                                </div>
-                            </div>
-                            <div class="insight-item">
-                                <div class="insight-icon">
-                                    <i class="fas fa-clock"></i>
-                                </div>
-                                <div class="insight-text">
-                                    <h4>Melhor horário</h4>
-                                    <p>Postar entre 18h-20h</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="action-bar">
-                <button id="generateReport" class="btn btn-primary btn-large">
-                    <i class="fas fa-file-pdf"></i> <span>Gerar Relatório</span>
-                </button>
-                <button id="printReport" class="btn btn-outline btn-large">
-                    <i class="fas fa-print"></i> <span>Imprimir</span>
-                </button>
-                <button id="exportData" class="btn btn-outline btn-large">
-                    <i class="fas fa-file-export"></i> <span>Exportar</span>
-                </button>
-                <button id="clearData" class="btn btn-danger btn-large">
-                    <i class="fas fa-trash-alt"></i> <span>Limpar</span>
-                </button>
-            </div>
-
-            <button id="mobileAddButton" class="floating-action-button mobile-only">
-                <i class="fas fa-plus"></i>
+        <!-- NAV -->
+        <nav class="tabs">
+            <button class="tab-btn active" onclick="app.switchTab('dashboard')">
+                <i class="fas fa-chart-line"></i> Resumo
             </button>
+            <button class="tab-btn" onclick="app.switchTab('atendimento')">
+                <i class="fas fa-comments"></i> Atendimento
+            </button>
+            <button class="tab-btn" onclick="app.switchTab('conteudo')">
+                <i class="fas fa-camera"></i> Conteúdo
+            </button>
+            <button class="tab-btn" onclick="app.switchTab('destaques')">
+                <i class="fas fa-star"></i> Destaques
+            </button>
+        </nav>
 
-            <div class="auto-save-notice">
-                <i class="fas fa-sync-alt"></i>
-                <span>Salvando automaticamente...</span>
-                <span id="lastSaveTime">Último: Agora</span>
+        <!-- DASHBOARD -->
+        <section id="dashboard" class="content-section active">
+            <h3 class="form-group">Indicadores da Semana</h3>
+            
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">Conversão</div>
+                    <div class="stat-value" id="stat-conversion">0.0%</div>
+                    <div class="stat-sub"><i class="fas fa-bullseye"></i> Leads / Msgs</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Atendimento</div>
+                    <div class="stat-value" id="stat-messages">0</div>
+                    <div class="stat-sub" id="stat-replies">0 respondidas</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Conteúdo</div>
+                    <div class="stat-value" id="stat-posts">0</div>
+                    <div class="stat-sub">Stories + Reels</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Engajamento Médio</div>
+                    <div class="stat-value" id="stat-engagement">0.0%</div>
+                    <div class="stat-sub" id="stat-perf-text">Calculando...</div>
+                </div>
             </div>
-        </main>
 
-        <footer class="footer">
-            <div class="footer-content">
-                <div class="footer-logo">
-                    <div class="logo-mini">
-                        <div class="logo-circle-sm"></div>
-                        <span class="desktop-only">Material para Construção</span>
-                        <span class="mobile-only">Material Construção</span>
+            <div class="card">
+                <h3>Ações Rápidas</h3>
+                <div style="display: flex; gap: 1rem; margin-top: 1rem; flex-wrap: wrap;">
+                    <button class="btn btn-primary" onclick="app.generateReport()">
+                        <i class="fas fa-print"></i> Gerar Relatório PDF
+                    </button>
+                    <button class="btn" style="border:1px solid var(--border);" onclick="app.clearWeekData()">
+                        <i class="fas fa-trash"></i> Limpar Semana
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ATENDIMENTO -->
+        <section id="atendimento" class="content-section">
+            <div class="card">
+                <h3>Novo Registro: Atendimento</h3>
+                <form id="form-attendance" onsubmit="app.addAttendance(event)">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Data</label>
+                            <input type="date" name="date" class="input-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Mensagens (Recebidas)</label>
+                            <input type="number" name="messages" class="input-control" min="0" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Respostas (Enviadas)</label>
+                            <input type="number" name="replies" class="input-control" min="0" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Orçamentos</label>
+                            <input type="number" name="budgets" class="input-control" min="0" value="0">
+                        </div>
+                        <div class="form-group">
+                            <label>Reservas/Vendas</label>
+                            <input type="number" name="reservations" class="input-control" min="0" value="0">
+                        </div>
                     </div>
-                </div>
-                <div class="footer-info">
-                    <p>Sistema Instagram &copy; <span id="currentYear"></span></p>
-                    <p class="user-credit">Para Iandra Jamile</p>
-                    <p class="version"><span id="dataCount">0 registros</span></p>
-                </div>
+                    <div class="form-group">
+                        <label>Observações</label>
+                        <input type="text" name="observations" class="input-control" placeholder="Opcional">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Adicionar Registro</button>
+                </form>
             </div>
-        </footer>
+
+            <div id="list-attendance" class="data-list">
+                <!-- Items injetados via JS -->
+            </div>
+        </section>
+
+        <!-- CONTEÚDO -->
+        <section id="conteudo" class="content-section">
+            <div class="card">
+                <h3>Novo Registro: Conteúdo</h3>
+                <form id="form-content" onsubmit="app.addContent(event)">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Data</label>
+                            <input type="date" name="date" class="input-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Qtd. Stories</label>
+                            <input type="number" name="stories" class="input-control" min="0" value="0">
+                        </div>
+                        <div class="form-group">
+                            <label>Views (Total Stories)</label>
+                            <input type="number" name="storyViews" class="input-control" min="0" value="0">
+                        </div>
+                        <div class="form-group">
+                            <label>Qtd. Reels</label>
+                            <input type="number" name="reels" class="input-control" min="0" value="0">
+                        </div>
+                        <div class="form-group">
+                            <label>Views (Total Reels)</label>
+                            <input type="number" name="reelViews" class="input-control" min="0" value="0">
+                        </div>
+                        <div class="form-group">
+                            <label>% Engajamento Dia</label>
+                            <input type="number" name="engagement" class="input-control" min="0" max="100" step="0.1" required>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Adicionar Conteúdo</button>
+                </form>
+            </div>
+
+            <div id="list-content" class="data-list">
+                <!-- Items injetados via JS -->
+            </div>
+        </section>
+
+        <!-- DESTAQUES -->
+        <section id="destaques" class="content-section">
+            <div class="card">
+                <h3>Análise Qualitativa</h3>
+                <p class="text-sm text-muted" style="margin-bottom: 1rem;">Estes dados aparecem no rodapé do relatório.</p>
+                <form id="form-highlights">
+                    <div class="form-group">
+                        <label>🏆 Melhor Story (Tema/Views)</label>
+                        <textarea id="hl-story" class="input-control" maxlength="200" placeholder="Ex: Promoção de Cimento (800 views)"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>🎬 Melhor Reel (Tema/Performance)</label>
+                        <textarea id="hl-reel" class="input-control" maxlength="200" placeholder="Ex: Dica de impermeabilização"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>💡 Sugestões Próxima Semana</label>
+                        <textarea id="hl-suggestions" class="input-control" maxlength="500" placeholder="Ideias de conteúdo..."></textarea>
+                    </div>
+                </form>
+            </div>
+        </section>
     </div>
 
-    <div id="notification" class="notification hidden">
-        <div class="notification-content">
-            <i class="fas fa-check-circle"></i>
-            <span class="notification-text">Operação realizada!</span>
-        </div>
-    </div>
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        class InstagramReportSystem {
+            constructor() {
+                this.isMIUI = this.detectMIUI();
+                this.currentWeek = this.getCurrentWeekFormat();
+                this.data = this.getEmptyDataStructure();
+                
+                // Elements cache
+                this.els = {
+                    weekPicker: document.getElementById('weekPicker'),
+                    formAttendance: document.getElementById('form-attendance'),
+                    formContent: document.getElementById('form-content'),
+                    listAttendance: document.getElementById('list-attendance'),
+                    listContent: document.getElementById('list-content'),
+                    stats: {
+                        conversion: document.getElementById('stat-conversion'),
+                        messages: document.getElementById('stat-messages'),
+                        replies: document.getElementById('stat-replies'),
+                        posts: document.getElementById('stat-posts'),
+                        engagement: document.getElementById('stat-engagement'),
+                        perfText: document.getElementById('stat-perf-text')
+                    },
+                    highlights: {
+                        story: document.getElementById('hl-story'),
+                        reel: document.getElementById('hl-reel'),
+                        suggestions: document.getElementById('hl-suggestions')
+                    }
+                };
 
-    <div id="mobileContextMenu" class="mobile-context-menu hidden">
-        <button class="context-item" data-action="addDay">
-            <i class="fas fa-plus"></i> Adicionar Dia
-        </button>
-        <button class="context-item" data-action="addWeek">
-            <i class="fas fa-calendar-week"></i> Adicionar Semana
-        </button>
-        <button class="context-item" data-action="duplicate">
-            <i class="fas fa-copy"></i> Duplicar
-        </button>
-        <button class="context-item context-cancel">
-            <i class="fas fa-times"></i> Cancelar
-        </button>
-    </div>
+                this.init();
+            }
 
-    <script src="/script.js"></script>
+            init() {
+                // 1. Aplica correções mobile
+                if (this.isMIUI) document.body.classList.add('miui-device');
+                
+                // 2. Setup inicial de data
+                this.els.weekPicker.value = this.currentWeek;
+                
+                // 3. Load Data
+                this.loadData();
+
+                // 4. Event Listeners
+                this.els.weekPicker.addEventListener('change', (e) => {
+                    this.currentWeek = e.target.value;
+                    this.loadData();
+                });
+
+                // Auto-save highlights on blur
+                ['story', 'reel', 'suggestions'].forEach(field => {
+                    this.els.highlights[field].addEventListener('blur', () => this.saveData());
+                });
+
+                // Set default date in forms to today
+                const today = new Date().toISOString().split('T')[0];
+                document.querySelector('input[name="date"]').value = today;
+                document.querySelector('#form-content input[name="date"]').value = today;
+
+                this.updateUI();
+                console.log("Sistema Iniciado. MIUI Detectado:", this.isMIUI);
+            }
+
+            // --- CORE DATA MANAGEMENT ---
+
+            getEmptyDataStructure() {
+                return {
+                    attendance: [],
+                    content: [],
+                    highlights: { bestStory: '', bestReel: '', suggestions: '' }
+                };
+            }
+
+            loadData() {
+                const key = `insta_report_${this.currentWeek}`;
+                const saved = localStorage.getItem(key);
+                if (saved) {
+                    this.data = JSON.parse(saved);
+                } else {
+                    this.data = this.getEmptyDataStructure();
+                }
+                
+                // Populate forms fields for highlights
+                this.els.highlights.story.value = this.data.highlights.bestStory || '';
+                this.els.highlights.reel.value = this.data.highlights.bestReel || '';
+                this.els.highlights.suggestions.value = this.data.highlights.suggestions || '';
+
+                this.updateUI();
+            }
+
+            saveData() {
+                // Update highlights object from DOM before saving
+                this.data.highlights = {
+                    bestStory: this.els.highlights.story.value,
+                    bestReel: this.els.highlights.reel.value,
+                    suggestions: this.els.highlights.suggestions.value
+                };
+
+                const key = `insta_report_${this.currentWeek}`;
+                localStorage.setItem(key, JSON.stringify(this.data));
+                this.updateStatistics();
+            }
+
+            exportData() {
+                const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(this.data));
+                const downloadAnchorNode = document.createElement('a');
+                downloadAnchorNode.setAttribute("href", dataStr);
+                downloadAnchorNode.setAttribute("download", `relatorio-${this.currentWeek}.json`);
+                document.body.appendChild(downloadAnchorNode);
+                downloadAnchorNode.click();
+                downloadAnchorNode.remove();
+            }
+
+            clearWeekData() {
+                if(confirm('Tem certeza que deseja apagar todos os dados desta semana?')) {
+                    this.data = this.getEmptyDataStructure();
+                    this.saveData();
+                    this.loadData(); // Reload UI
+                    this.showToast('Dados da semana limpos.', 'success');
+                }
+            }
+
+            // --- ADDING DATA ---
+
+            addAttendance(e) {
+                e.preventDefault();
+                const formData = new FormData(e.target);
+                
+                const entry = {
+                    id: Date.now(),
+                    date: formData.get('date'),
+                    messages: parseInt(formData.get('messages')) || 0,
+                    replies: parseInt(formData.get('replies')) || 0,
+                    budgets: parseInt(formData.get('budgets')) || 0,
+                    reservations: parseInt(formData.get('reservations')) || 0,
+                    observations: formData.get('observations') || ''
+                };
+                
+                // Calculate lost inside the object logic if needed, but keeping simple for storage
+                entry.lost = Math.max(0, entry.messages - (entry.budgets + entry.reservations)); // Simplified logic
+
+                this.data.attendance.push(entry);
+                this.data.attendance.sort((a, b) => new Date(a.date) - new Date(b.date)); // Keep sorted
+                
+                this.saveData();
+                this.updateUI();
+                e.target.reset();
+                // Reset date to today
+                e.target.querySelector('input[name="date"]').value = new Date().toISOString().split('T')[0];
+                this.showToast('Atendimento registrado!', 'success');
+            }
+
+            addContent(e) {
+                e.preventDefault();
+                const formData = new FormData(e.target);
+
+                const entry = {
+                    id: Date.now(),
+                    date: formData.get('date'),
+                    stories: parseInt(formData.get('stories')) || 0,
+                    storyViews: parseInt(formData.get('storyViews')) || 0,
+                    reels: parseInt(formData.get('reels')) || 0,
+                    reelViews: parseInt(formData.get('reelViews')) || 0,
+                    engagement: parseFloat(formData.get('engagement')) || 0
+                };
+
+                this.data.content.push(entry);
+                this.data.content.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+                this.saveData();
+                this.updateUI();
+                e.target.reset();
+                e.target.querySelector('input[name="date"]').value = new Date().toISOString().split('T')[0];
+                this.showToast('Conteúdo registrado!', 'success');
+            }
+
+            deleteItem(type, id) {
+                if(!confirm('Excluir este registro?')) return;
+                this.data[type] = this.data[type].filter(item => item.id !== id);
+                this.saveData();
+                this.updateUI();
+            }
+
+            // --- UI RENDERING ---
+
+            updateUI() {
+                this.renderAttendanceList();
+                this.renderContentList();
+                this.updateStatistics();
+            }
+
+            renderAttendanceList() {
+                this.els.listAttendance.innerHTML = this.data.attendance.map(item => `
+                    <div class="data-item">
+                        <div class="data-header">
+                            <span class="data-date">${this.formatDate(item.date)}</span>
+                            <button class="btn btn-danger btn-icon" style="width:28px;height:28px;font-size:0.7rem;" onclick="app.deleteItem('attendance', ${item.id})"><i class="fas fa-trash"></i></button>
+                        </div>
+                        <div class="data-metrics">
+                            <div class="metric-pill">Msgs: <span>${item.messages}</span></div>
+                            <div class="metric-pill">Resp: <span>${item.replies}</span></div>
+                            <div class="metric-pill" style="background:#ebf8ff; color:#2b6cb0;">Leads: <span>${item.budgets + item.reservations}</span></div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            renderContentList() {
+                this.els.listContent.innerHTML = this.data.content.map(item => `
+                    <div class="data-item">
+                        <div class="data-header">
+                            <span class="data-date">${this.formatDate(item.date)}</span>
+                            <button class="btn btn-danger btn-icon" style="width:28px;height:28px;font-size:0.7rem;" onclick="app.deleteItem('content', ${item.id})"><i class="fas fa-trash"></i></button>
+                        </div>
+                        <div class="data-metrics">
+                            <div class="metric-pill">St: <span>${item.stories}</span></div>
+                            <div class="metric-pill">Reels: <span>${item.reels}</span></div>
+                            <div class="metric-pill">Eng: <span>${item.engagement}%</span></div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            updateStatistics() {
+                // Atendimento Stats
+                const totalMsgs = this.data.attendance.reduce((acc, curr) => acc + curr.messages, 0);
+                const totalReplies = this.data.attendance.reduce((acc, curr) => acc + curr.replies, 0);
+                const totalLeads = this.data.attendance.reduce((acc, curr) => acc + (curr.budgets + curr.reservations), 0);
+                
+                const conversion = totalMsgs > 0 ? ((totalLeads / totalMsgs) * 100).toFixed(1) : "0.0";
+
+                this.els.stats.messages.textContent = totalMsgs;
+                this.els.stats.replies.textContent = `${totalReplies} respondidas`;
+                this.els.stats.conversion.textContent = `${conversion}%`;
+
+                // Content Stats
+                const totalStories = this.data.content.reduce((acc, curr) => acc + curr.stories, 0);
+                const totalReels = this.data.content.reduce((acc, curr) => acc + curr.reels, 0);
+                const engList = this.data.content.map(c => c.engagement).filter(e => e > 0);
+                const avgEng = engList.length > 0 
+                    ? (engList.reduce((a, b) => a + b, 0) / engList.length).toFixed(1) 
+                    : "0.0";
+
+                this.els.stats.posts.textContent = totalStories + totalReels;
+                this.els.stats.engagement.textContent = `${avgEng}%`;
+
+                // Performance Indicator
+                const engVal = parseFloat(avgEng);
+                let perfText = "Dados insuficientes";
+                let perfColor = "var(--text-muted)";
+                
+                if (engList.length > 0) {
+                    if (engVal >= 5) { perfText = "Excelente 🚀"; perfColor = "var(--success)"; }
+                    else if (engVal >= 3) { perfText = "Bom 👍"; perfColor = "var(--primary)"; }
+                    else if (engVal >= 2) { perfText = "Regular ⚠️"; perfColor = "var(--warning)"; }
+                    else { perfText = "Melhorar 📉"; perfColor = "var(--danger)"; }
+                }
+                
+                this.els.stats.perfText.textContent = perfText;
+                this.els.stats.perfText.style.color = perfColor;
+            }
+
+            // --- REPORT GENERATION ---
+
+            generateReport() {
+                this.saveData(); // Ensure saved
+                
+                // Calculate Summaries for Report
+                const att = this.data.attendance;
+                const cont = this.data.content;
+                
+                const sum = {
+                    msgs: att.reduce((a,c)=>a+c.messages,0),
+                    replies: att.reduce((a,c)=>a+c.replies,0),
+                    leads: att.reduce((a,c)=>a+(c.budgets+c.reservations),0),
+                    stories: cont.reduce((a,c)=>a+c.stories,0),
+                    reels: cont.reduce((a,c)=>a+c.reels,0),
+                    sViews: cont.reduce((a,c)=>a+c.storyViews,0),
+                    rViews: cont.reduce((a,c)=>a+c.reelViews,0)
+                };
+                
+                const conversion = sum.msgs > 0 ? ((sum.leads / sum.msgs) * 100).toFixed(1) : 0;
+                
+                const reportHTML = `
+                <html>
+                <head>
+                    <title>Relatório - ${this.currentWeek}</title>
+                    <style>
+                        body { font-family: 'Segoe UI', sans-serif; padding: 40px; color: #1a202c; max-width: 800px; margin: 0 auto; }
+                        h1 { color: #1a365d; margin-bottom: 5px; }
+                        h2 { color: #2c5282; border-bottom: 2px solid #2c5282; padding-bottom: 10px; margin-top: 30px; font-size: 1.2rem; }
+                        .header { text-align: center; margin-bottom: 40px; }
+                        .meta { color: #718096; font-size: 0.9rem; margin-top: 5px; }
+                        
+                        table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 0.9rem; }
+                        th, td { border: 1px solid #e2e8f0; padding: 8px 12px; text-align: left; }
+                        th { background-color: #f7fafc; color: #2d3748; font-weight: 600; }
+                        .num { text-align: right; }
+                        
+                        .summary-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 30px; }
+                        .card { border: 1px solid #e2e8f0; padding: 15px; border-radius: 8px; text-align: center; }
+                        .val { font-size: 1.5rem; font-weight: bold; color: #2c5282; }
+                        .lab { font-size: 0.75rem; text-transform: uppercase; color: #718096; }
+
+                        .highlights { background: #ebf8ff; padding: 20px; border-radius: 8px; margin-top: 30px; }
+                        .highlight-item { margin-bottom: 15px; }
+                        .highlight-label { font-weight: bold; color: #2b6cb0; display: block; margin-bottom: 4px; }
+
+                        @media print {
+                            body { -webkit-print-color-adjust: exact; }
+                            .no-print { display: none; }
+                        }
+                    </style>
+                </head>
+                <body>
+                    <div class="header">
+                        <h1>Mat. Construção N. Sra. da Conceição</h1>
+                        <div class="meta">Relatório Semanal de Performance Instagram</div>
+                        <div class="meta"><strong>Semana:</strong> ${this.currentWeek} | <strong>Gerado por:</strong> Iandra Jamille</div>
+                    </div>
+
+                    <!-- Resumo Stats -->
+                    <div class="summary-grid">
+                        <div class="card"><div class="val">${sum.msgs}</div><div class="lab">Mensagens</div></div>
+                        <div class="card"><div class="val">${sum.leads}</div><div class="lab">Potenciais</div></div>
+                        <div class="card"><div class="val">${conversion}%</div><div class="lab">Conversão</div></div>
+                        <div class="card"><div class="val">${document.getElementById('stat-engagement').textContent}</div><div class="lab">Engajamento</div></div>
+                    </div>
+
+                    <h2>1. Detalhamento de Atendimento</h2>
+                    <table>
+                        <thead><tr><th>Data</th><th class="num">Msgs</th><th class="num">Respostas</th><th class="num">Leads</th><th>Obs</th></tr></thead>
+                        <tbody>
+                            ${att.map(d => `<tr>
+                                <td>${this.formatDate(d.date)}</td>
+                                <td class="num">${d.messages}</td>
+                                <td class="num">${d.replies}</td>
+                                <td class="num">${d.budgets + d.reservations}</td>
+                                <td>${d.observations || '-'}</td>
+                            </tr>`).join('')}
+                            <tr style="font-weight:bold; background:#f7fafc">
+                                <td>TOTAL</td>
+                                <td class="num">${sum.msgs}</td>
+                                <td class="num">${sum.replies}</td>
+                                <td class="num">${sum.leads}</td>
+                                <td></td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h2>2. Performance de Conteúdo</h2>
+                    <table>
+                        <thead><tr><th>Data</th><th class="num">Stories</th><th class="num">S. Views</th><th class="num">Reels</th><th class="num">R. Views</th><th class="num">Engajamento</th></tr></thead>
+                        <tbody>
+                            ${cont.map(c => `<tr>
+                                <td>${this.formatDate(c.date)}</td>
+                                <td class="num">${c.stories}</td>
+                                <td class="num">${c.storyViews}</td>
+                                <td class="num">${c.reels}</td>
+                                <td class="num">${c.reelViews}</td>
+                                <td class="num">${c.engagement}%</td>
+                            </tr>`).join('')}
+                            <tr style="font-weight:bold; background:#f7fafc">
+                                <td>TOTAL</td>
+                                <td class="num">${sum.stories}</td>
+                                <td class="num">${sum.sViews}</td>
+                                <td class="num">${sum.reels}</td>
+                                <td class="num">${sum.rViews}</td>
+                                <td class="num">-</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="highlights">
+                        <h3>Destaques & Insights</h3>
+                        <div class="highlight-item">
+                            <span class="highlight-label">🏆 Melhor Story</span>
+                            ${this.data.highlights.bestStory || 'Não informado'}
+                        </div>
+                        <div class="highlight-item">
+                            <span class="highlight-label">🎬 Melhor Reel</span>
+                            ${this.data.highlights.bestReel || 'Não informado'}
+                        </div>
+                        <div class="highlight-item">
+                            <span class="highlight-label">💡 Sugestões para Próxima Semana</span>
+                            ${this.data.highlights.suggestions || 'Sem sugestões'}
+                        </div>
+                    </div>
+
+                    <script>
+                        window.onload = function() { setTimeout(function() { window.print(); }, 500); }
+                    <\/script>
+                </body>
+                </html>
+                `;
+
+                const win = window.open('', '_blank');
+                win.document.write(reportHTML);
+                win.document.close();
+            }
+
+            // --- HELPERS ---
+
+            switchTab(tabId) {
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
+                
+                // Find clicked button based on onclick attribute or text
+                // Simple fix: finding via event is harder here without passing 'this', so manual select
+                const btn = Array.from(document.querySelectorAll('.tab-btn')).find(b => b.textContent.toLowerCase().includes(tabId === 'dashboard' ? 'resumo' : tabId));
+                if(btn) btn.classList.add('active');
+
+                document.getElementById(tabId).classList.add('active');
+            }
+
+            detectMIUI() {
+                const ua = navigator.userAgent;
+                return /MiuiBrowser|XiaoMi|Redmi|MIUI/i.test(ua);
+            }
+
+            getCurrentWeekFormat() {
+                const date = new Date();
+                date.setHours(0, 0, 0, 0);
+                // Thursday in current week decides the year.
+                date.setDate(date.getDate() + 3 - (date.getDay() + 6) % 7);
+                var week1 = new Date(date.getFullYear(), 0, 4);
+                // Adjust to Thursday in week 1 and count number of weeks from date to week1.
+                var weeks = 1 + Math.round(((date.getTime() - week1.getTime()) / 86400000 - 3 + (week1.getDay() + 6) % 7) / 7);
+                return `${date.getFullYear()}-W${weeks.toString().padStart(2, '0')}`;
+            }
+
+            formatDate(dateStr) {
+                if (!dateStr) return '';
+                const parts = dateStr.split('-');
+                return `${parts[2]}/${parts[1]}`;
+            }
+
+            showToast(message, type = 'success') {
+                const container = document.getElementById('toast-container');
+                const toast = document.createElement('div');
+                toast.className = `toast ${type}`;
+                toast.innerHTML = type === 'success' ? '<i class="fas fa-check-circle"></i>' : '<i class="fas fa-exclamation-circle"></i>';
+                toast.innerHTML += `<span>${message}</span>`;
+                
+                container.appendChild(toast);
+                setTimeout(() => {
+                    toast.style.opacity = '0';
+                    setTimeout(() => toast.remove(), 300);
+                }, 3000);
+            }
+        }
+
+        // Initialize App
+        const app = new InstagramReportSystem();
+    </script>
 </body>
 </html>
