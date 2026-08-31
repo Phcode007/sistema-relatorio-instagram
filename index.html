@@ -1,975 +1,252 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Relatório Instagram - N. Sra. da Conceição</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        /* --- DESIGN SYSTEM & VARIAVEIS --- */
-        :root {
-            /* Cores da Marca */
-            --primary-dark: #1a365d;
-            --primary: #2c5282;
-            --primary-light: #4299e1;
-            
-            /* Ação e Status */
-            --accent: #dd6b20;
-            --accent-light: #ed8936;
-            --success: #38a169;
-            --danger: #e53e3e;
-            --warning: #d69e2e;
-            
-            /* Neutros */
-            --bg-body: #f7fafc;
-            --bg-card: #ffffff;
-            --text-main: #2d3748;
-            --text-muted: #718096;
-            --border: #e2e8f0;
-
-            /* Sombras */
-            --shadow-sm: 0 1px 3px 0 rgba(0,0,0,0.1), 0 1px 2px 0 rgba(0,0,0,0.06);
-            --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
-        }
-
-        /* --- RESET & BASE --- */
-        * { box-sizing: border-box; margin: 0; padding: 0; outline: none; -webkit-tap-highlight-color: transparent; }
-        
-        body {
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-            background-color: var(--bg-body);
-            color: var(--text-main);
-            line-height: 1.5;
-            padding-bottom: 80px; /* Espaço para FAB ou Tabbar mobile se houver */
-        }
-
-        /* --- TIPOGRAFIA --- */
-        h1, h2, h3, h4 { color: var(--primary-dark); font-weight: 700; }
-        .text-sm { font-size: 0.875rem; }
-        .text-xs { font-size: 0.75rem; }
-        .text-center { text-align: center; }
-        .font-bold { font-weight: 600; }
-
-        /* --- LAYOUT --- */
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 1rem;
-        }
-
-        .header {
-            background: var(--bg-card);
-            padding: 1rem;
-            border-bottom: 1px solid var(--border);
-            margin-bottom: 1.5rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 1rem;
-            box-shadow: var(--shadow-sm);
-        }
-
-        .brand {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-        }
-
-        .logo-circle {
-            width: 48px;
-            height: 48px;
-            background: var(--primary);
-            color: white;
-            border-radius: 50%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.6rem;
-            font-weight: bold;
-            line-height: 1;
-            text-align: center;
-        }
-
-        /* --- CONTROLES DE DATA --- */
-        .week-selector {
-            display: flex;
-            gap: 0.5rem;
-            align-items: center;
-        }
-
-        input[type="week"] {
-            padding: 0.5rem;
-            border: 1px solid var(--border);
-            border-radius: 0.375rem;
-            font-family: inherit;
-            color: var(--primary-dark);
-            font-weight: 600;
-        }
-
-        /* --- ABAS DE NAVEGAÇÃO --- */
-        .tabs {
-            display: flex;
-            gap: 0.5rem;
-            overflow-x: auto;
-            padding-bottom: 0.5rem;
-            margin-bottom: 1.5rem;
-            scrollbar-width: none; /* Firefox */
-        }
-        .tabs::-webkit-scrollbar { display: none; }
-
-        .tab-btn {
-            background: white;
-            border: 1px solid var(--border);
-            padding: 0.75rem 1.25rem;
-            border-radius: 2rem;
-            white-space: nowrap;
-            color: var(--text-muted);
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .tab-btn.active {
-            background: var(--primary);
-            color: white;
-            border-color: var(--primary);
-            box-shadow: var(--shadow-sm);
-        }
-
-        /* --- CARDS E CONTEÚDO --- */
-        .content-section { display: none; animation: fadeIn 0.3s ease; }
-        .content-section.active { display: block; }
-
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-        .card {
-            background: var(--bg-card);
-            border-radius: 0.75rem;
-            padding: 1.25rem;
-            box-shadow: var(--shadow-sm);
-            margin-bottom: 1.5rem;
-            border: 1px solid var(--border);
-        }
-
-        /* --- DASHBOARD STATS --- */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 1rem;
-            margin-bottom: 2rem;
-        }
-
-        .stat-card {
-            background: white;
-            padding: 1rem;
-            border-radius: 0.75rem;
-            border: 1px solid var(--border);
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .stat-card::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; width: 4px; height: 100%;
-            background: var(--primary-light);
-        }
-
-        .stat-label { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
-        .stat-value { font-size: 1.5rem; font-weight: 700; color: var(--primary-dark); }
-        .stat-sub { font-size: 0.75rem; color: var(--success); display: flex; align-items: center; gap: 0.25rem; }
-
-        /* --- FORMULÁRIOS & INPUTS --- */
-        .form-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
-            margin-bottom: 1rem;
-        }
-
-        .form-group { margin-bottom: 1rem; }
-        .form-group label { display: block; font-size: 0.875rem; color: var(--text-muted); margin-bottom: 0.25rem; }
-        
-        .input-control {
-            width: 100%;
-            padding: 0.75rem;
-            border: 1px solid var(--border);
-            border-radius: 0.5rem;
-            font-size: 1rem;
-            transition: border-color 0.2s;
-            background: #fff;
-        }
-        
-        .input-control:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.2); }
-        textarea.input-control { resize: vertical; min-height: 80px; }
-
-        /* --- TABELAS RESPONSIVAS (CARD VIEW NO MOBILE) --- */
-        .data-list { display: flex; flex-direction: column; gap: 1rem; }
-        
-        .data-item {
-            background: white;
-            border: 1px solid var(--border);
-            border-radius: 0.5rem;
-            padding: 1rem;
-            display: grid;
-            grid-template-columns: 1fr auto;
-            gap: 0.5rem;
-            align-items: center;
-        }
-
-        .data-header { display: flex; justify-content: space-between; align-items: center; width: 100%; grid-column: 1 / -1; border-bottom: 1px solid #f0f0f0; padding-bottom: 0.5rem; margin-bottom: 0.5rem; }
-        .data-date { font-weight: 600; color: var(--primary); }
-        
-        .data-metrics { 
-            display: grid; 
-            grid-template-columns: repeat(2, 1fr); 
-            gap: 0.5rem; 
-            font-size: 0.875rem; 
-            grid-column: 1 / -1;
-        }
-        
-        .metric-pill { background: #f7fafc; padding: 0.25rem 0.5rem; border-radius: 4px; color: var(--text-muted); }
-        .metric-pill span { color: var(--text-main); font-weight: 600; }
-
-        /* --- BOTÕES --- */
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-            padding: 0.75rem 1.5rem;
-            border-radius: 0.5rem;
-            font-weight: 600;
-            border: none;
-            cursor: pointer;
-            transition: all 0.2s;
-            font-size: 0.9rem;
-        }
-
-        .btn-primary { background: var(--primary); color: white; width: 100%; }
-        .btn-primary:active { transform: scale(0.98); }
-        .btn-danger { background: #fff5f5; color: var(--danger); border: 1px solid #fed7d7; }
-        .btn-icon { padding: 0.5rem; border-radius: 50%; width: 36px; height: 36px; }
-        
-        .fab {
-            position: fixed;
-            bottom: 2rem;
-            right: 1.5rem;
-            width: 56px;
-            height: 56px;
-            border-radius: 50%;
-            background: var(--accent);
-            color: white;
-            box-shadow: 0 4px 12px rgba(221, 107, 32, 0.4);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-            z-index: 100;
-            cursor: pointer;
-        }
-
-        /* --- NOTIFICATIONS --- */
-        #toast-container {
-            position: fixed;
-            top: 1rem;
-            right: 1rem;
-            z-index: 1000;
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-        }
-        .toast {
-            background: var(--text-main);
-            color: white;
-            padding: 1rem;
-            border-radius: 0.5rem;
-            box-shadow: var(--shadow-md);
-            animation: slideIn 0.3s ease;
-            font-size: 0.9rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-        .toast.success { border-left: 4px solid var(--success); }
-        .toast.error { border-left: 4px solid var(--danger); }
-        
-        @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
-
-        /* --- MIUI & MOBILE CORRECTIONS --- */
-        .miui-device input, .miui-device button, .miui-device select {
-            min-height: 48px !important; /* Touch target fix */
-            font-size: 16px !important; /* Prevent zoom */
-        }
-        .miui-device .input-control:focus {
-            /* Force redraw fix */
-            transform: translateZ(0); 
-        }
-
-        /* --- DESKTOP TWEAKS --- */
-        @media (min-width: 768px) {
-            .stats-grid { grid-template-columns: repeat(4, 1fr); }
-            .data-item { grid-template-columns: 150px 1fr auto; }
-            .data-header { grid-column: 1; border: none; margin: 0; padding: 0; }
-            .data-metrics { grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)); grid-column: 2; }
-            .btn-primary { width: auto; }
-        }
-
-        /* --- PRINT STYLES (Hide UI) --- */
-        @media print {
-            body * { visibility: hidden; }
-            #printable-area, #printable-area * { visibility: visible; }
-            #printable-area { position: absolute; left: 0; top: 0; width: 100%; }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Relatório Instagram — N. Sra. da Conceição</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root { --primary: #1e3a5f; --accent: #dd6b20; }
+    body { font-family: 'Segoe UI', system-ui, sans-serif; background: #f1f5f9; }
+    .card { background: white; border-radius: 1rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+    .tab-btn { padding: 0.75rem 1.25rem; border-radius: 2rem; border: 1px solid #e2e8f0; background: white; color: #64748b; font-weight: 600; cursor: pointer; white-space: nowrap; transition: all 0.2s; }
+    .tab-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+    @media print { .no-print { display: none !important; } body { background: white; } }
+  </style>
 </head>
-<body>
+<body class="pb-20">
+  <header class="bg-white border-b border-slate-200 px-4 py-4 sticky top-0 z-50">
+    <div class="max-w-6xl mx-auto flex flex-wrap items-center justify-between gap-3">
+      <div class="flex items-center gap-3">
+        <div class="w-11 h-11 bg-[#1e3a5f] rounded-full flex items-center justify-center text-white text-[0.6rem] font-bold text-center leading-tight">INSC<br>NSC</div>
+        <div>
+          <div class="text-xs text-slate-500">Mat. Construção</div>
+          <div class="text-lg font-bold text-[#1e3a5f]">Nossa Sra. da Conceição</div>
+        </div>
+      </div>
+      <div class="flex items-center gap-2 no-print">
+        <input type="month" id="monthPicker" class="border border-slate-300 rounded-lg px-3 py-2 text-sm font-semibold text-[#1e3a5f]">
+        <button onclick="generatePDF()" class="bg-[#dd6b20] text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-[#c05621] transition">
+          <i class="fas fa-file-pdf"></i> PDF
+        </button>
+      </div>
+    </div>
+  </header>
 
-    <div id="toast-container"></div>
-
-    <div class="container">
-        <!-- HEADER -->
-        <header class="header">
-            <div class="brand">
-                <div class="logo-circle">
-                    <span>INSC</span>
-                    <span>NSC</span>
-                </div>
-                <div>
-                    <h2 class="text-sm">Mat. Construção</h2>
-                    <h1 style="font-size: 1.25rem;">Nossa Sra. da Conceição</h1>
-                </div>
-            </div>
-            <div class="week-selector">
-                <label for="weekPicker" class="text-sm text-muted">Semana:</label>
-                <input type="week" id="weekPicker">
-                <button class="btn btn-icon" onclick="app.exportData()" title="Exportar JSON">
-                    <i class="fas fa-file-export text-muted"></i>
-                </button>
-            </div>
-        </header>
-
-        <!-- NAV -->
-        <nav class="tabs">
-            <button class="tab-btn active" onclick="app.switchTab('dashboard')">
-                <i class="fas fa-chart-line"></i> Resumo
-            </button>
-            <button class="tab-btn" onclick="app.switchTab('atendimento')">
-                <i class="fas fa-comments"></i> Atendimento
-            </button>
-            <button class="tab-btn" onclick="app.switchTab('conteudo')">
-                <i class="fas fa-camera"></i> Conteúdo
-            </button>
-            <button class="tab-btn" onclick="app.switchTab('destaques')">
-                <i class="fas fa-star"></i> Destaques
-            </button>
-        </nav>
-
-        <!-- DASHBOARD -->
-        <section id="dashboard" class="content-section active">
-            <h3 class="form-group">Indicadores da Semana</h3>
-            
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-label">Conversão</div>
-                    <div class="stat-value" id="stat-conversion">0.0%</div>
-                    <div class="stat-sub"><i class="fas fa-bullseye"></i> Leads / Msgs</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-label">Atendimento</div>
-                    <div class="stat-value" id="stat-messages">0</div>
-                    <div class="stat-sub" id="stat-replies">0 respondidas</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-label">Conteúdo</div>
-                    <div class="stat-value" id="stat-posts">0</div>
-                    <div class="stat-sub">Stories + Reels</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-label">Engajamento Médio</div>
-                    <div class="stat-value" id="stat-engagement">0.0%</div>
-                    <div class="stat-sub" id="stat-perf-text">Calculando...</div>
-                </div>
-            </div>
-
-            <div class="card">
-                <h3>Ações Rápidas</h3>
-                <div style="display: flex; gap: 1rem; margin-top: 1rem; flex-wrap: wrap;">
-                    <button class="btn btn-primary" onclick="app.generateReport()">
-                        <i class="fas fa-print"></i> Gerar Relatório PDF
-                    </button>
-                    <button class="btn" style="border:1px solid var(--border);" onclick="app.clearWeekData()">
-                        <i class="fas fa-trash"></i> Limpar Semana
-                    </button>
-                </div>
-            </div>
-        </section>
-
-        <!-- ATENDIMENTO -->
-        <section id="atendimento" class="content-section">
-            <div class="card">
-                <h3>Novo Registro: Atendimento</h3>
-                <form id="form-attendance" onsubmit="app.addAttendance(event)">
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label>Data</label>
-                            <input type="date" name="date" class="input-control" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Mensagens (Recebidas)</label>
-                            <input type="number" name="messages" class="input-control" min="0" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Respostas (Enviadas)</label>
-                            <input type="number" name="replies" class="input-control" min="0" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Orçamentos</label>
-                            <input type="number" name="budgets" class="input-control" min="0" value="0">
-                        </div>
-                        <div class="form-group">
-                            <label>Reservas/Vendas</label>
-                            <input type="number" name="reservations" class="input-control" min="0" value="0">
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label>Observações</label>
-                        <input type="text" name="observations" class="input-control" placeholder="Opcional">
-                    </div>
-                    <button type="submit" class="btn btn-primary">Adicionar Registro</button>
-                </form>
-            </div>
-
-            <div id="list-attendance" class="data-list">
-                <!-- Items injetados via JS -->
-            </div>
-        </section>
-
-        <!-- CONTEÚDO -->
-        <section id="conteudo" class="content-section">
-            <div class="card">
-                <h3>Novo Registro: Conteúdo</h3>
-                <form id="form-content" onsubmit="app.addContent(event)">
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label>Data</label>
-                            <input type="date" name="date" class="input-control" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Qtd. Stories</label>
-                            <input type="number" name="stories" class="input-control" min="0" value="0">
-                        </div>
-                        <div class="form-group">
-                            <label>Views (Total Stories)</label>
-                            <input type="number" name="storyViews" class="input-control" min="0" value="0">
-                        </div>
-                        <div class="form-group">
-                            <label>Qtd. Reels</label>
-                            <input type="number" name="reels" class="input-control" min="0" value="0">
-                        </div>
-                        <div class="form-group">
-                            <label>Views (Total Reels)</label>
-                            <input type="number" name="reelViews" class="input-control" min="0" value="0">
-                        </div>
-                        <div class="form-group">
-                            <label>% Engajamento Dia</label>
-                            <input type="number" name="engagement" class="input-control" min="0" max="100" step="0.1" required>
-                        </div>
-                    </div>
-                    <button type="submit" class="btn btn-primary">Adicionar Conteúdo</button>
-                </form>
-            </div>
-
-            <div id="list-content" class="data-list">
-                <!-- Items injetados via JS -->
-            </div>
-        </section>
-
-        <!-- DESTAQUES -->
-        <section id="destaques" class="content-section">
-            <div class="card">
-                <h3>Análise Qualitativa</h3>
-                <p class="text-sm text-muted" style="margin-bottom: 1rem;">Estes dados aparecem no rodapé do relatório.</p>
-                <form id="form-highlights">
-                    <div class="form-group">
-                        <label>🏆 Melhor Story (Tema/Views)</label>
-                        <textarea id="hl-story" class="input-control" maxlength="200" placeholder="Ex: Promoção de Cimento (800 views)"></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label>🎬 Melhor Reel (Tema/Performance)</label>
-                        <textarea id="hl-reel" class="input-control" maxlength="200" placeholder="Ex: Dica de impermeabilização"></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label>💡 Sugestões Próxima Semana</label>
-                        <textarea id="hl-suggestions" class="input-control" maxlength="500" placeholder="Ideias de conteúdo..."></textarea>
-                    </div>
-                </form>
-            </div>
-        </section>
+  <main class="max-w-6xl mx-auto p-4" id="printable">
+    <!-- Abas -->
+    <div class="flex gap-2 overflow-x-auto pb-2 mb-6 no-print" style="scrollbar-width: none;">
+      <button class="tab-btn active" onclick="switchTab('dashboard')"><i class="fas fa-chart-line"></i> Dashboard</button>
+      <button class="tab-btn" onclick="switchTab('input')"><i class="fas fa-edit"></i> Lançar Dados</button>
     </div>
 
-    <!-- JAVASCRIPT LOGIC -->
-    <script>
-        class InstagramReportSystem {
-            constructor() {
-                this.isMIUI = this.detectMIUI();
-                this.currentWeek = this.getCurrentWeekFormat();
-                this.data = this.getEmptyDataStructure();
-                
-                // Elements cache
-                this.els = {
-                    weekPicker: document.getElementById('weekPicker'),
-                    formAttendance: document.getElementById('form-attendance'),
-                    formContent: document.getElementById('form-content'),
-                    listAttendance: document.getElementById('list-attendance'),
-                    listContent: document.getElementById('list-content'),
-                    stats: {
-                        conversion: document.getElementById('stat-conversion'),
-                        messages: document.getElementById('stat-messages'),
-                        replies: document.getElementById('stat-replies'),
-                        posts: document.getElementById('stat-posts'),
-                        engagement: document.getElementById('stat-engagement'),
-                        perfText: document.getElementById('stat-perf-text')
-                    },
-                    highlights: {
-                        story: document.getElementById('hl-story'),
-                        reel: document.getElementById('hl-reel'),
-                        suggestions: document.getElementById('hl-suggestions')
-                    }
-                };
+    <!-- Dashboard -->
+    <div id="tab-dashboard">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+        <div class="card p-4">
+          <div class="text-xs text-slate-500 uppercase mb-1">Impressões</div>
+          <div class="text-2xl font-bold text-[#1e3a5f]" id="dash-impressions">0</div>
+        </div>
+        <div class="card p-4">
+          <div class="text-xs text-slate-500 uppercase mb-1">Alcance</div>
+          <div class="text-2xl font-bold text-[#1e3a5f]" id="dash-reach">0</div>
+        </div>
+        <div class="card p-4">
+          <div class="text-xs text-slate-500 uppercase mb-1">Seguidores</div>
+          <div class="text-2xl font-bold text-[#1e3a5f]" id="dash-followers">0</div>
+        </div>
+        <div class="card p-4">
+          <div class="text-xs text-slate-500 uppercase mb-1">Engajamento</div>
+          <div class="text-2xl font-bold text-[#dd6b20]" id="dash-engagement">0%</div>
+        </div>
+      </div>
 
-                this.init();
-            }
+      <div class="card p-6 mb-6">
+        <h3 class="text-lg font-bold text-[#1e3a5f] mb-4">Evolução Diária</h3>
+        <div class="h-72"><canvas id="chart"></canvas></div>
+      </div>
 
-            init() {
-                // 1. Aplica correções mobile
-                if (this.isMIUI) document.body.classList.add('miui-device');
-                
-                // 2. Setup inicial de data
-                this.els.weekPicker.value = this.currentWeek;
-                
-                // 3. Load Data
-                this.loadData();
+      <div class="card p-6">
+        <h3 class="text-lg font-bold text-[#1e3a5f] mb-4">Conteúdo do Mês</h3>
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead><tr class="border-b border-slate-200 text-slate-500 text-left">
+              <th class="py-2">Data</th><th class="py-2">Tipo</th><th class="py-2">Tema</th>
+              <th class="py-2 text-right">❤️</th><th class="py-2 text-right">💬</th><th class="py-2 text-right">👁️</th>
+            </tr></thead>
+            <tbody id="content-table"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
 
-                // 4. Event Listeners
-                this.els.weekPicker.addEventListener('change', (e) => {
-                    this.currentWeek = e.target.value;
-                    this.loadData();
-                });
+    <!-- Input -->
+    <div id="tab-input" class="hidden">
+      <div class="card p-6 mb-6">
+        <h3 class="text-lg font-bold text-[#1e3a5f] mb-4">📊 Métricas Diárias do Mês</h3>
+        <p class="text-sm text-slate-500 mb-4">Digite os dados do Insights do Instagram (um por dia)</p>
+        <div class="grid grid-cols-2 md:grid-cols-5 gap-3 mb-3">
+          <input type="date" id="in-date" class="border rounded-lg px-3 py-2 text-sm">
+          <input type="number" id="in-impressions" placeholder="Impressões" class="border rounded-lg px-3 py-2 text-sm">
+          <input type="number" id="in-reach" placeholder="Alcance" class="border rounded-lg px-3 py-2 text-sm">
+          <input type="number" id="in-followers" placeholder="Seguidores" class="border rounded-lg px-3 py-2 text-sm">
+          <button onclick="addDaily()" class="bg-[#1e3a5f] text-white rounded-lg text-sm font-semibold hover:bg-[#152a45]">Adicionar</button>
+        </div>
+        <div id="daily-list" class="space-y-2"></div>
+      </div>
 
-                // Auto-save highlights on blur
-                ['story', 'reel', 'suggestions'].forEach(field => {
-                    this.els.highlights[field].addEventListener('blur', () => this.saveData());
-                });
+      <div class="card p-6">
+        <h3 class="text-lg font-bold text-[#1e3a5f] mb-4">📱 Conteúdo Publicado</h3>
+        <div class="grid grid-cols-1 md:grid-cols-6 gap-3 mb-3">
+          <input type="date" id="c-date" class="border rounded-lg px-3 py-2 text-sm">
+          <select id="c-type" class="border rounded-lg px-3 py-2 text-sm">
+            <option value="feed">Feed</option><option value="reel">Reel</option><option value="story">Story</option><option value="carousel">Carrossel</option>
+          </select>
+          <input type="text" id="c-caption" placeholder="Tema/Legenda" class="border rounded-lg px-3 py-2 text-sm md:col-span-2">
+          <input type="number" id="c-likes" placeholder="Curtidas" class="border rounded-lg px-3 py-2 text-sm">
+          <button onclick="addContent()" class="bg-[#dd6b20] text-white rounded-lg text-sm font-semibold hover:bg-[#c05621]">Adicionar</button>
+        </div>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-3">
+          <input type="number" id="c-comments" placeholder="Comentários" class="border rounded-lg px-3 py-2 text-sm">
+          <input type="number" id="c-views" placeholder="Visualizações" class="border rounded-lg px-3 py-2 text-sm">
+        </div>
+        <div id="content-list" class="space-y-2"></div>
+      </div>
+    </div>
+  </main>
 
-                // Set default date in forms to today
-                const today = new Date().toISOString().split('T')[0];
-                document.querySelector('input[name="date"]').value = today;
-                document.querySelector('#form-content input[name="date"]').value = today;
+  <script>
+    const state = { daily: [], content: [] };
+    let chart = null;
 
-                this.updateUI();
-                console.log("Sistema Iniciado. MIUI Detectado:", this.isMIUI);
-            }
+    function getKey() { return 'ig_' + document.getElementById('monthPicker').value; }
 
-            // --- CORE DATA MANAGEMENT ---
+    function load() {
+      document.getElementById('monthPicker').value = new Date().toISOString().slice(0, 7);
+      const saved = localStorage.getItem(getKey());
+      if (saved) { Object.assign(state, JSON.parse(saved)); }
+      render();
+    }
 
-            getEmptyDataStructure() {
-                return {
-                    attendance: [],
-                    content: [],
-                    highlights: { bestStory: '', bestReel: '', suggestions: '' }
-                };
-            }
+    function save() { localStorage.setItem(getKey(), JSON.stringify(state)); render(); }
 
-            loadData() {
-                const key = `insta_report_${this.currentWeek}`;
-                const saved = localStorage.getItem(key);
-                if (saved) {
-                    this.data = JSON.parse(saved);
-                } else {
-                    this.data = this.getEmptyDataStructure();
-                }
-                
-                // Populate forms fields for highlights
-                this.els.highlights.story.value = this.data.highlights.bestStory || '';
-                this.els.highlights.reel.value = this.data.highlights.bestReel || '';
-                this.els.highlights.suggestions.value = this.data.highlights.suggestions || '';
+    function switchTab(tab) {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      event.target.classList.add('active');
+      document.getElementById('tab-dashboard').classList.toggle('hidden', tab !== 'dashboard');
+      document.getElementById('tab-input').classList.toggle('hidden', tab !== 'input');
+      if (tab === 'dashboard') render();
+    }
 
-                this.updateUI();
-            }
+    function addDaily() {
+      const date = document.getElementById('in-date').value;
+      if (!date) return alert('Selecione a data');
+      state.daily.push({
+        date, impressions: +document.getElementById('in-impressions').value || 0,
+        reach: +document.getElementById('in-reach').value || 0,
+        followers: +document.getElementById('in-followers').value || 0
+      });
+      state.daily.sort((a,b) => new Date(a.date) - new Date(b.date));
+      ['in-date','in-impressions','in-reach','in-followers'].forEach(id => document.getElementById(id).value = '');
+      save();
+    }
 
-            saveData() {
-                // Update highlights object from DOM before saving
-                this.data.highlights = {
-                    bestStory: this.els.highlights.story.value,
-                    bestReel: this.els.highlights.reel.value,
-                    suggestions: this.els.highlights.suggestions.value
-                };
+    function addContent() {
+      const date = document.getElementById('c-date').value;
+      if (!date) return alert('Selecione a data');
+      state.content.push({
+        date, type: document.getElementById('c-type').value,
+        caption: document.getElementById('c-caption').value,
+        likes: +document.getElementById('c-likes').value || 0,
+        comments: +document.getElementById('c-comments').value || 0,
+        views: +document.getElementById('c-views').value || 0
+      });
+      state.content.sort((a,b) => new Date(a.date) - new Date(b.date));
+      ['c-date','c-caption','c-likes','c-comments','c-views'].forEach(id => document.getElementById(id).value = '');
+      save();
+    }
 
-                const key = `insta_report_${this.currentWeek}`;
-                localStorage.setItem(key, JSON.stringify(this.data));
-                this.updateStatistics();
-            }
+    function removeDaily(i) { state.daily.splice(i,1); save(); }
+    function removeContent(i) { state.content.splice(i,1); save(); }
 
-            exportData() {
-                const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(this.data));
-                const downloadAnchorNode = document.createElement('a');
-                downloadAnchorNode.setAttribute("href", dataStr);
-                downloadAnchorNode.setAttribute("download", `relatorio-${this.currentWeek}.json`);
-                document.body.appendChild(downloadAnchorNode);
-                downloadAnchorNode.click();
-                downloadAnchorNode.remove();
-            }
+    function render() {
+      const totalImp = state.daily.reduce((a,d) => a + d.impressions, 0);
+      const totalReach = state.daily.reduce((a,d) => a + d.reach, 0);
+      const lastFollowers = state.daily.slice(-1)[0]?.followers || 0;
+      const totalLikes = state.content.reduce((a,c) => a + c.likes, 0);
+      const totalComments = state.content.reduce((a,c) => a + c.comments, 0);
+      const engRate = totalReach > 0 ? (((totalLikes + totalComments) / totalReach) * 100).toFixed(2) : '0.00';
 
-            clearWeekData() {
-                if(confirm('Tem certeza que deseja apagar todos os dados desta semana?')) {
-                    this.data = this.getEmptyDataStructure();
-                    this.saveData();
-                    this.loadData(); // Reload UI
-                    this.showToast('Dados da semana limpos.', 'success');
-                }
-            }
+      document.getElementById('dash-impressions').textContent = totalImp.toLocaleString('pt-BR');
+      document.getElementById('dash-reach').textContent = totalReach.toLocaleString('pt-BR');
+      document.getElementById('dash-followers').textContent = lastFollowers.toLocaleString('pt-BR');
+      document.getElementById('dash-engagement').textContent = engRate + '%';
 
-            // --- ADDING DATA ---
+      // Chart
+      const labels = state.daily.map(d => d.date.split('-').reverse().slice(0,2).join('/'));
+      const ctx = document.getElementById('chart').getContext('2d');
+      if (chart) chart.destroy();
+      chart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels,
+          datasets: [
+            { label: 'Impressões', data: state.daily.map(d => d.impressions), borderColor: '#1e3a5f', backgroundColor: 'rgba(30,58,95,0.1)', fill: true, tension: 0.4 },
+            { label: 'Alcance', data: state.daily.map(d => d.reach), borderColor: '#dd6b20', backgroundColor: 'rgba(221,107,32,0.1)', fill: true, tension: 0.4 }
+          ]
+        },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'top' } }, scales: { y: { beginAtZero: true } } }
+      });
 
-            addAttendance(e) {
-                e.preventDefault();
-                const formData = new FormData(e.target);
-                
-                const entry = {
-                    id: Date.now(),
-                    date: formData.get('date'),
-                    messages: parseInt(formData.get('messages')) || 0,
-                    replies: parseInt(formData.get('replies')) || 0,
-                    budgets: parseInt(formData.get('budgets')) || 0,
-                    reservations: parseInt(formData.get('reservations')) || 0,
-                    observations: formData.get('observations') || ''
-                };
-                
-                // Calculate lost inside the object logic if needed, but keeping simple for storage
-                entry.lost = Math.max(0, entry.messages - (entry.budgets + entry.reservations)); // Simplified logic
+      // Tables
+      document.getElementById('content-table').innerHTML = state.content.map((c,i) => `
+        <tr class="border-b border-slate-100">
+          <td class="py-2">${c.date.split('-').reverse().join('/')}</td>
+          <td class="py-2"><span class="px-2 py-0.5 rounded-full text-xs font-semibold ${c.type==='reel'?'bg-purple-100 text-purple-700':c.type==='carousel'?'bg-green-100 text-green-700':'bg-blue-100 text-blue-700'}">${c.type}</span></td>
+          <td class="py-2 max-w-xs truncate">${c.caption || '-'}</td>
+          <td class="py-2 text-right font-semibold">${c.likes}</td>
+          <td class="py-2 text-right font-semibold">${c.comments}</td>
+          <td class="py-2 text-right font-semibold">${c.views}</td>
+        </tr>
+      `).join('') || '<tr><td colspan="6" class="py-4 text-center text-slate-400">Nenhum conteúdo registrado</td></tr>';
 
-                this.data.attendance.push(entry);
-                this.data.attendance.sort((a, b) => new Date(a.date) - new Date(b.date)); // Keep sorted
-                
-                this.saveData();
-                this.updateUI();
-                e.target.reset();
-                // Reset date to today
-                e.target.querySelector('input[name="date"]').value = new Date().toISOString().split('T')[0];
-                this.showToast('Atendimento registrado!', 'success');
-            }
+      document.getElementById('daily-list').innerHTML = state.daily.map((d,i) => `
+        <div class="flex justify-between items-center bg-slate-50 p-2 rounded-lg text-sm">
+          <span>${d.date.split('-').reverse().join('/')} — <strong>${d.impressions.toLocaleString('pt-BR')}</strong> imp. / <strong>${d.reach.toLocaleString('pt-BR')}</strong> alc.</span>
+          <button onclick="removeDaily(${i})" class="text-red-500 hover:text-red-700"><i class="fas fa-trash"></i></button>
+        </div>
+      `).join('');
 
-            addContent(e) {
-                e.preventDefault();
-                const formData = new FormData(e.target);
+      document.getElementById('content-list').innerHTML = state.content.map((c,i) => `
+        <div class="flex justify-between items-center bg-slate-50 p-2 rounded-lg text-sm">
+          <span>${c.date.split('-').reverse().join('/')} — ${c.type} — ${c.caption || '(sem legenda)'}</span>
+          <button onclick="removeContent(${i})" class="text-red-500 hover:text-red-700"><i class="fas fa-trash"></i></button>
+        </div>
+      `).join('');
+    }
 
-                const entry = {
-                    id: Date.now(),
-                    date: formData.get('date'),
-                    stories: parseInt(formData.get('stories')) || 0,
-                    storyViews: parseInt(formData.get('storyViews')) || 0,
-                    reels: parseInt(formData.get('reels')) || 0,
-                    reelViews: parseInt(formData.get('reelViews')) || 0,
-                    engagement: parseFloat(formData.get('engagement')) || 0
-                };
+    function generatePDF() {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      const month = document.getElementById('monthPicker').value;
+      doc.setFontSize(18); doc.text('Relatório Instagram — N. Sra. da Conceição', 14, 20);
+      doc.setFontSize(11); doc.setTextColor(100);
+      doc.text(`Período: ${month}`, 14, 28);
+      doc.text(`Gerado em: ${new Date().toLocaleDateString('pt-BR')}`, 14, 34);
+      doc.setTextColor(30, 58, 95); doc.setFontSize(14); doc.text('Resumo do Mês', 14, 48);
+      doc.setFontSize(11);
+      doc.text(`Impressões: ${document.getElementById('dash-impressions').textContent}`, 14, 58);
+      doc.text(`Alcance: ${document.getElementById('dash-reach').textContent}`, 14, 65);
+      doc.text(`Seguidores: ${document.getElementById('dash-followers').textContent}`, 14, 72);
+      doc.text(`Taxa de Engajamento: ${document.getElementById('dash-engagement').textContent}`, 14, 79);
+      doc.save(`relatorio-instagram-${month}.pdf`);
+    }
 
-                this.data.content.push(entry);
-                this.data.content.sort((a, b) => new Date(a.date) - new Date(b.date));
-
-                this.saveData();
-                this.updateUI();
-                e.target.reset();
-                e.target.querySelector('input[name="date"]').value = new Date().toISOString().split('T')[0];
-                this.showToast('Conteúdo registrado!', 'success');
-            }
-
-            deleteItem(type, id) {
-                if(!confirm('Excluir este registro?')) return;
-                this.data[type] = this.data[type].filter(item => item.id !== id);
-                this.saveData();
-                this.updateUI();
-            }
-
-            // --- UI RENDERING ---
-
-            updateUI() {
-                this.renderAttendanceList();
-                this.renderContentList();
-                this.updateStatistics();
-            }
-
-            renderAttendanceList() {
-                this.els.listAttendance.innerHTML = this.data.attendance.map(item => `
-                    <div class="data-item">
-                        <div class="data-header">
-                            <span class="data-date">${this.formatDate(item.date)}</span>
-                            <button class="btn btn-danger btn-icon" style="width:28px;height:28px;font-size:0.7rem;" onclick="app.deleteItem('attendance', ${item.id})"><i class="fas fa-trash"></i></button>
-                        </div>
-                        <div class="data-metrics">
-                            <div class="metric-pill">Msgs: <span>${item.messages}</span></div>
-                            <div class="metric-pill">Resp: <span>${item.replies}</span></div>
-                            <div class="metric-pill" style="background:#ebf8ff; color:#2b6cb0;">Leads: <span>${item.budgets + item.reservations}</span></div>
-                        </div>
-                    </div>
-                `).join('');
-            }
-
-            renderContentList() {
-                this.els.listContent.innerHTML = this.data.content.map(item => `
-                    <div class="data-item">
-                        <div class="data-header">
-                            <span class="data-date">${this.formatDate(item.date)}</span>
-                            <button class="btn btn-danger btn-icon" style="width:28px;height:28px;font-size:0.7rem;" onclick="app.deleteItem('content', ${item.id})"><i class="fas fa-trash"></i></button>
-                        </div>
-                        <div class="data-metrics">
-                            <div class="metric-pill">St: <span>${item.stories}</span></div>
-                            <div class="metric-pill">Reels: <span>${item.reels}</span></div>
-                            <div class="metric-pill">Eng: <span>${item.engagement}%</span></div>
-                        </div>
-                    </div>
-                `).join('');
-            }
-
-            updateStatistics() {
-                // Atendimento Stats
-                const totalMsgs = this.data.attendance.reduce((acc, curr) => acc + curr.messages, 0);
-                const totalReplies = this.data.attendance.reduce((acc, curr) => acc + curr.replies, 0);
-                const totalLeads = this.data.attendance.reduce((acc, curr) => acc + (curr.budgets + curr.reservations), 0);
-                
-                const conversion = totalMsgs > 0 ? ((totalLeads / totalMsgs) * 100).toFixed(1) : "0.0";
-
-                this.els.stats.messages.textContent = totalMsgs;
-                this.els.stats.replies.textContent = `${totalReplies} respondidas`;
-                this.els.stats.conversion.textContent = `${conversion}%`;
-
-                // Content Stats
-                const totalStories = this.data.content.reduce((acc, curr) => acc + curr.stories, 0);
-                const totalReels = this.data.content.reduce((acc, curr) => acc + curr.reels, 0);
-                const engList = this.data.content.map(c => c.engagement).filter(e => e > 0);
-                const avgEng = engList.length > 0 
-                    ? (engList.reduce((a, b) => a + b, 0) / engList.length).toFixed(1) 
-                    : "0.0";
-
-                this.els.stats.posts.textContent = totalStories + totalReels;
-                this.els.stats.engagement.textContent = `${avgEng}%`;
-
-                // Performance Indicator
-                const engVal = parseFloat(avgEng);
-                let perfText = "Dados insuficientes";
-                let perfColor = "var(--text-muted)";
-                
-                if (engList.length > 0) {
-                    if (engVal >= 5) { perfText = "Excelente 🚀"; perfColor = "var(--success)"; }
-                    else if (engVal >= 3) { perfText = "Bom 👍"; perfColor = "var(--primary)"; }
-                    else if (engVal >= 2) { perfText = "Regular ⚠️"; perfColor = "var(--warning)"; }
-                    else { perfText = "Melhorar 📉"; perfColor = "var(--danger)"; }
-                }
-                
-                this.els.stats.perfText.textContent = perfText;
-                this.els.stats.perfText.style.color = perfColor;
-            }
-
-            // --- REPORT GENERATION ---
-
-            generateReport() {
-                this.saveData(); // Ensure saved
-                
-                // Calculate Summaries for Report
-                const att = this.data.attendance;
-                const cont = this.data.content;
-                
-                const sum = {
-                    msgs: att.reduce((a,c)=>a+c.messages,0),
-                    replies: att.reduce((a,c)=>a+c.replies,0),
-                    leads: att.reduce((a,c)=>a+(c.budgets+c.reservations),0),
-                    stories: cont.reduce((a,c)=>a+c.stories,0),
-                    reels: cont.reduce((a,c)=>a+c.reels,0),
-                    sViews: cont.reduce((a,c)=>a+c.storyViews,0),
-                    rViews: cont.reduce((a,c)=>a+c.reelViews,0)
-                };
-                
-                const conversion = sum.msgs > 0 ? ((sum.leads / sum.msgs) * 100).toFixed(1) : 0;
-                
-                const reportHTML = `
-                <html>
-                <head>
-                    <title>Relatório - ${this.currentWeek}</title>
-                    <style>
-                        body { font-family: 'Segoe UI', sans-serif; padding: 40px; color: #1a202c; max-width: 800px; margin: 0 auto; }
-                        h1 { color: #1a365d; margin-bottom: 5px; }
-                        h2 { color: #2c5282; border-bottom: 2px solid #2c5282; padding-bottom: 10px; margin-top: 30px; font-size: 1.2rem; }
-                        .header { text-align: center; margin-bottom: 40px; }
-                        .meta { color: #718096; font-size: 0.9rem; margin-top: 5px; }
-                        
-                        table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 0.9rem; }
-                        th, td { border: 1px solid #e2e8f0; padding: 8px 12px; text-align: left; }
-                        th { background-color: #f7fafc; color: #2d3748; font-weight: 600; }
-                        .num { text-align: right; }
-                        
-                        .summary-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 30px; }
-                        .card { border: 1px solid #e2e8f0; padding: 15px; border-radius: 8px; text-align: center; }
-                        .val { font-size: 1.5rem; font-weight: bold; color: #2c5282; }
-                        .lab { font-size: 0.75rem; text-transform: uppercase; color: #718096; }
-
-                        .highlights { background: #ebf8ff; padding: 20px; border-radius: 8px; margin-top: 30px; }
-                        .highlight-item { margin-bottom: 15px; }
-                        .highlight-label { font-weight: bold; color: #2b6cb0; display: block; margin-bottom: 4px; }
-
-                        @media print {
-                            body { -webkit-print-color-adjust: exact; }
-                            .no-print { display: none; }
-                        }
-                    </style>
-                </head>
-                <body>
-                    <div class="header">
-                        <h1>Mat. Construção N. Sra. da Conceição</h1>
-                        <div class="meta">Relatório Semanal de Performance Instagram</div>
-                        <div class="meta"><strong>Semana:</strong> ${this.currentWeek} | <strong>Gerado por:</strong> Iandra Jamille</div>
-                    </div>
-
-                    <!-- Resumo Stats -->
-                    <div class="summary-grid">
-                        <div class="card"><div class="val">${sum.msgs}</div><div class="lab">Mensagens</div></div>
-                        <div class="card"><div class="val">${sum.leads}</div><div class="lab">Potenciais</div></div>
-                        <div class="card"><div class="val">${conversion}%</div><div class="lab">Conversão</div></div>
-                        <div class="card"><div class="val">${document.getElementById('stat-engagement').textContent}</div><div class="lab">Engajamento</div></div>
-                    </div>
-
-                    <h2>1. Detalhamento de Atendimento</h2>
-                    <table>
-                        <thead><tr><th>Data</th><th class="num">Msgs</th><th class="num">Respostas</th><th class="num">Leads</th><th>Obs</th></tr></thead>
-                        <tbody>
-                            ${att.map(d => `<tr>
-                                <td>${this.formatDate(d.date)}</td>
-                                <td class="num">${d.messages}</td>
-                                <td class="num">${d.replies}</td>
-                                <td class="num">${d.budgets + d.reservations}</td>
-                                <td>${d.observations || '-'}</td>
-                            </tr>`).join('')}
-                            <tr style="font-weight:bold; background:#f7fafc">
-                                <td>TOTAL</td>
-                                <td class="num">${sum.msgs}</td>
-                                <td class="num">${sum.replies}</td>
-                                <td class="num">${sum.leads}</td>
-                                <td></td>
-                            </tr>
-                        </tbody>
-                    </table>
-
-                    <h2>2. Performance de Conteúdo</h2>
-                    <table>
-                        <thead><tr><th>Data</th><th class="num">Stories</th><th class="num">S. Views</th><th class="num">Reels</th><th class="num">R. Views</th><th class="num">Engajamento</th></tr></thead>
-                        <tbody>
-                            ${cont.map(c => `<tr>
-                                <td>${this.formatDate(c.date)}</td>
-                                <td class="num">${c.stories}</td>
-                                <td class="num">${c.storyViews}</td>
-                                <td class="num">${c.reels}</td>
-                                <td class="num">${c.reelViews}</td>
-                                <td class="num">${c.engagement}%</td>
-                            </tr>`).join('')}
-                            <tr style="font-weight:bold; background:#f7fafc">
-                                <td>TOTAL</td>
-                                <td class="num">${sum.stories}</td>
-                                <td class="num">${sum.sViews}</td>
-                                <td class="num">${sum.reels}</td>
-                                <td class="num">${sum.rViews}</td>
-                                <td class="num">-</td>
-                            </tr>
-                        </tbody>
-                    </table>
-
-                    <div class="highlights">
-                        <h3>Destaques & Insights</h3>
-                        <div class="highlight-item">
-                            <span class="highlight-label">🏆 Melhor Story</span>
-                            ${this.data.highlights.bestStory || 'Não informado'}
-                        </div>
-                        <div class="highlight-item">
-                            <span class="highlight-label">🎬 Melhor Reel</span>
-                            ${this.data.highlights.bestReel || 'Não informado'}
-                        </div>
-                        <div class="highlight-item">
-                            <span class="highlight-label">💡 Sugestões para Próxima Semana</span>
-                            ${this.data.highlights.suggestions || 'Sem sugestões'}
-                        </div>
-                    </div>
-
-                    <script>
-                        window.onload = function() { setTimeout(function() { window.print(); }, 500); }
-                    <\/script>
-                </body>
-                </html>
-                `;
-
-                const win = window.open('', '_blank');
-                win.document.write(reportHTML);
-                win.document.close();
-            }
-
-            // --- HELPERS ---
-
-            switchTab(tabId) {
-                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-                document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
-                
-                // Find clicked button based on onclick attribute or text
-                // Simple fix: finding via event is harder here without passing 'this', so manual select
-                const btn = Array.from(document.querySelectorAll('.tab-btn')).find(b => b.textContent.toLowerCase().includes(tabId === 'dashboard' ? 'resumo' : tabId));
-                if(btn) btn.classList.add('active');
-
-                document.getElementById(tabId).classList.add('active');
-            }
-
-            detectMIUI() {
-                const ua = navigator.userAgent;
-                return /MiuiBrowser|XiaoMi|Redmi|MIUI/i.test(ua);
-            }
-
-            getCurrentWeekFormat() {
-                const date = new Date();
-                date.setHours(0, 0, 0, 0);
-                // Thursday in current week decides the year.
-                date.setDate(date.getDate() + 3 - (date.getDay() + 6) % 7);
-                var week1 = new Date(date.getFullYear(), 0, 4);
-                // Adjust to Thursday in week 1 and count number of weeks from date to week1.
-                var weeks = 1 + Math.round(((date.getTime() - week1.getTime()) / 86400000 - 3 + (week1.getDay() + 6) % 7) / 7);
-                return `${date.getFullYear()}-W${weeks.toString().padStart(2, '0')}`;
-            }
-
-            formatDate(dateStr) {
-                if (!dateStr) return '';
-                const parts = dateStr.split('-');
-                return `${parts[2]}/${parts[1]}`;
-            }
-
-            showToast(message, type = 'success') {
-                const container = document.getElementById('toast-container');
-                const toast = document.createElement('div');
-                toast.className = `toast ${type}`;
-                toast.innerHTML = type === 'success' ? '<i class="fas fa-check-circle"></i>' : '<i class="fas fa-exclamation-circle"></i>';
-                toast.innerHTML += `<span>${message}</span>`;
-                
-                container.appendChild(toast);
-                setTimeout(() => {
-                    toast.style.opacity = '0';
-                    setTimeout(() => toast.remove(), 300);
-                }, 3000);
-            }
-        }
-
-        // Initialize App
-        const app = new InstagramReportSystem();
-    </script>
+    document.getElementById('monthPicker').addEventListener('change', load);
+    load();
+  </script>
 </body>
 </html>
