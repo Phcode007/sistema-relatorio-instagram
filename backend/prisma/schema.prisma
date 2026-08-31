@@ -30,6 +30,7 @@ model Company {
   updatedAt DateTime      @updatedAt
   users     UserCompany[]
   reports   Report[]
+  instagramAccount InstagramAccount?
 }
 
 model UserCompany {
@@ -101,4 +102,15 @@ model Highlight {
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
   report          Report   @relation(fields: [reportId], references: [id], onDelete: Cascade)
+}
+
+model InstagramAccount {
+  id             String   @id @default(cuid())
+  companyId      String   @unique
+  igUserId       String
+  igUsername     String?
+  pageAccessToken String  @db.Text
+  connectedAt    DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  company        Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
 }
