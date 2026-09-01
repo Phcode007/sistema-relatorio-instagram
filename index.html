@@ -1,252 +1,2145 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Relatório Instagram — N. Sra. da Conceição</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Painel Profissional — Instagram Insights</title>
+
   <style>
-    :root { --primary: #1e3a5f; --accent: #dd6b20; }
-    body { font-family: 'Segoe UI', system-ui, sans-serif; background: #f1f5f9; }
-    .card { background: white; border-radius: 1rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-    .tab-btn { padding: 0.75rem 1.25rem; border-radius: 2rem; border: 1px solid #e2e8f0; background: white; color: #64748b; font-weight: 600; cursor: pointer; white-space: nowrap; transition: all 0.2s; }
-    .tab-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
-    @media print { .no-print { display: none !important; } body { background: white; } }
+    /* =========================================================
+       RESET / BASE
+    ========================================================= */
+    :root {
+      --bg: #0f0f13;
+      --card: #1c1c24;
+      --card-hover: #22222d;
+      --border: #2a2a35;
+
+      --text: #ffffff;
+      --text-secondary: #9ca3af;
+      --text-muted: #6b7280;
+
+      --purple: #8b5cf6;
+      --pink: #ec4899;
+      --green: #10b981;
+      --red: #ef4444;
+
+      --gradient: linear-gradient(
+        90deg,
+        #8b5cf6 0%,
+        #ec4899 100%
+      );
+
+      --radius: 20px;
+      --transition: 0.3s ease;
+
+      --shadow:
+        0 12px 35px rgba(0, 0, 0, 0.28);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      min-height: 100vh;
+      background:
+        radial-gradient(
+          circle at top right,
+          rgba(139, 92, 246, 0.08),
+          transparent 30%
+        ),
+        radial-gradient(
+          circle at bottom left,
+          rgba(236, 72, 153, 0.05),
+          transparent 25%
+        ),
+        var(--bg);
+
+      color: var(--text);
+      font-family:
+        Inter,
+        ui-sans-serif,
+        system-ui,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
+
+      line-height: 1.5;
+      padding: 20px;
+    }
+
+    button,
+    input {
+      font: inherit;
+    }
+
+    button {
+      border: 0;
+      outline: none;
+    }
+
+    [contenteditable="true"] {
+      outline: none;
+      border-radius: 6px;
+      transition: var(--transition);
+      cursor: text;
+    }
+
+    [contenteditable="true"]:hover {
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    [contenteditable="true"]:focus {
+      background: rgba(139, 92, 246, 0.08);
+      box-shadow: 0 0 0 1px rgba(139, 92, 246, 0.35);
+    }
+
+    /* =========================================================
+       CONTAINER
+    ========================================================= */
+    .dashboard {
+      width: min(1400px, 100%);
+      margin: 0 auto;
+    }
+
+    /* =========================================================
+       HEADER
+    ========================================================= */
+    .header {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      margin-bottom: 28px;
+    }
+
+    .header-left {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--text-secondary);
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .brand-icon {
+      width: 30px;
+      height: 30px;
+      border-radius: 10px;
+
+      display: grid;
+      place-items: center;
+
+      background: var(--gradient);
+      color: #fff;
+      font-size: 0.9rem;
+
+      box-shadow:
+        0 8px 25px rgba(236, 72, 153, 0.2);
+    }
+
+    .header h1 {
+      font-size: clamp(1.6rem, 4vw, 2.35rem);
+      line-height: 1.1;
+      letter-spacing: -0.04em;
+      font-weight: 800;
+    }
+
+    .period-wrapper {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      width: fit-content;
+
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+    }
+
+    .period-icon {
+      width: 30px;
+      height: 30px;
+
+      display: grid;
+      place-items: center;
+
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+    }
+
+    .header-actions {
+      display: flex;
+      justify-content: flex-start;
+    }
+
+    .icon-button {
+      width: 44px;
+      height: 44px;
+
+      display: grid;
+      place-items: center;
+
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      background: var(--card);
+      color: var(--text-secondary);
+
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .icon-button:hover {
+      background: var(--card-hover);
+      color: #fff;
+      transform: translateY(-2px);
+      border-color: rgba(139, 92, 246, 0.4);
+    }
+
+    /* =========================================================
+       SECTION
+    ========================================================= */
+    .section {
+      margin-bottom: 34px;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 15px;
+      margin-bottom: 16px;
+    }
+
+    .section-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .section-subtitle {
+      color: var(--text-secondary);
+      font-size: 0.8rem;
+    }
+
+    /* =========================================================
+       INSIGHTS
+    ========================================================= */
+    .insights-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 14px;
+    }
+
+    .insight-card {
+      position: relative;
+      overflow: hidden;
+
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+
+      padding: 22px;
+
+      min-height: 150px;
+
+      box-shadow: var(--shadow);
+
+      transition:
+        transform var(--transition),
+        border-color var(--transition),
+        background var(--transition);
+    }
+
+    .insight-card::after {
+      content: "";
+
+      position: absolute;
+      top: -40px;
+      right: -40px;
+
+      width: 100px;
+      height: 100px;
+
+      background: rgba(139, 92, 246, 0.08);
+      border-radius: 50%;
+
+      pointer-events: none;
+    }
+
+    .insight-card:hover {
+      transform: translateY(-4px);
+      background: var(--card-hover);
+      border-color: rgba(139, 92, 246, 0.35);
+    }
+
+    .insight-label {
+      color: var(--text-secondary);
+      font-size: 0.85rem;
+      margin-bottom: 12px;
+    }
+
+    .insight-value-row {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+    }
+
+    .insight-value {
+      font-size: clamp(1.8rem, 4vw, 2.5rem);
+      font-weight: 800;
+      letter-spacing: -0.05em;
+    }
+
+    .trend-up {
+      color: var(--green);
+      font-size: 1rem;
+      font-weight: 800;
+    }
+
+    .editable-empty {
+      min-width: 100px;
+      color: var(--text-muted);
+    }
+
+    .editable-empty:empty::before {
+      content: "Clique para editar";
+      color: #4b5563;
+      font-size: 0.85rem;
+      letter-spacing: normal;
+    }
+
+    /* =========================================================
+       INTERACTIONS
+    ========================================================= */
+    .analytics-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+
+      padding: 20px;
+
+      box-shadow: var(--shadow);
+    }
+
+    .tabs-wrapper {
+      overflow-x: auto;
+      padding-bottom: 5px;
+      margin-bottom: 24px;
+
+      scrollbar-width: thin;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 8px;
+      width: max-content;
+    }
+
+    .tab {
+      padding: 9px 14px;
+
+      color: var(--text-secondary);
+      background: #17171e;
+
+      border: 1px solid var(--border);
+      border-radius: 12px;
+
+      white-space: nowrap;
+
+      cursor: pointer;
+
+      transition: var(--transition);
+    }
+
+    .tab:hover {
+      color: #fff;
+      background: var(--card-hover);
+    }
+
+    .tab.active {
+      color: #fff;
+      background: linear-gradient(
+        135deg,
+        rgba(139, 92, 246, 0.23),
+        rgba(236, 72, 153, 0.16)
+      );
+
+      border-color: rgba(139, 92, 246, 0.6);
+
+      box-shadow:
+        0 5px 20px rgba(139, 92, 246, 0.1);
+    }
+
+    /* =========================================================
+       TAB CONTENT
+    ========================================================= */
+    .tab-panel {
+      display: none;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .tab-panel.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(8px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .interaction-list {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .interaction-item {
+      display: flex;
+      flex-direction: column;
+      gap: 9px;
+    }
+
+    .interaction-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 15px;
+    }
+
+    .content-type {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+
+      color: #f9fafb;
+      font-size: 0.92rem;
+      font-weight: 600;
+    }
+
+    .content-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: var(--gradient);
+      box-shadow: 0 0 12px rgba(236, 72, 153, 0.45);
+    }
+
+    .interaction-number {
+      color: var(--text-secondary);
+      font-size: 0.87rem;
+      font-weight: 600;
+
+      min-width: 50px;
+      text-align: right;
+    }
+
+    .bar-track {
+      height: 10px;
+
+      width: 100%;
+
+      background: #2a2a35;
+      border-radius: 999px;
+
+      overflow: hidden;
+    }
+
+    .bar-fill {
+      width: 0%;
+      height: 100%;
+
+      background: var(--gradient);
+
+      border-radius: inherit;
+
+      transition:
+        width 0.6s ease,
+        opacity 0.3s ease;
+    }
+
+    /* =========================================================
+       PROFILE ACTIVITY
+    ========================================================= */
+    .activity-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+
+      padding: 10px 18px;
+
+      box-shadow: var(--shadow);
+    }
+
+    .activity-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+      gap: 16px;
+
+      padding: 16px 4px;
+
+      border-bottom: 1px solid rgba(42, 42, 53, 0.75);
+    }
+
+    .activity-item:last-child {
+      border-bottom: 0;
+    }
+
+    .activity-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+
+      min-width: 0;
+    }
+
+    .activity-icon {
+      width: 42px;
+      height: 42px;
+
+      flex-shrink: 0;
+
+      display: grid;
+      place-items: center;
+
+      border-radius: 14px;
+
+      background: #2a2a35;
+      color: #fff;
+
+      font-size: 1.05rem;
+    }
+
+    .activity-name {
+      color: #f3f4f6;
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+
+    .activity-description {
+      color: var(--text-muted);
+      font-size: 0.73rem;
+      margin-top: 2px;
+    }
+
+    .activity-value {
+      min-width: 60px;
+
+      text-align: right;
+
+      color: #fff;
+      font-size: 1.1rem;
+      font-weight: 800;
+    }
+
+    /* =========================================================
+       FOOTER
+    ========================================================= */
+    .footer {
+      text-align: center;
+
+      color: var(--text-muted);
+
+      font-size: 0.75rem;
+
+      margin-top: 10px;
+      padding: 10px 0 20px;
+    }
+
+    .status {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+    }
+
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--green);
+
+      box-shadow: 0 0 10px rgba(16, 185, 129, 0.7);
+    }
+
+    /* =========================================================
+       RESPONSIVIDADE
+    ========================================================= */
+    @media (min-width: 640px) {
+      body {
+        padding: 30px;
+      }
+
+      .insights-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .header {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .header-actions {
+        justify-content: flex-end;
+      }
+
+      .analytics-card {
+        padding: 26px;
+      }
+    }
+
+    @media (min-width: 900px) {
+      .insights-grid {
+        grid-template-columns: repeat(4, 1fr);
+      }
+
+      .insight-card {
+        min-height: 165px;
+      }
+    }
+
+    @media (min-width: 1100px) {
+      body {
+        padding: 45px;
+      }
+
+      .dashboard {
+        padding: 0 10px;
+      }
+
+      .insights-grid {
+        gap: 18px;
+      }
+
+      .insight-card {
+        padding: 26px;
+      }
+    }
+
+    @media (max-width: 500px) {
+      .analytics-card {
+        padding: 16px;
+      }
+
+      .tab {
+        padding: 8px 11px;
+        font-size: 0.78rem;
+      }
+
+      .activity-card {
+        padding: 5px 14px;
+      }
+
+      .activity-icon {
+        width: 38px;
+        height: 38px;
+      }
+
+      .activity-name {
+        font-size: 0.84rem;
+      }
+    }
   </style>
 </head>
-<body class="pb-20">
-  <header class="bg-white border-b border-slate-200 px-4 py-4 sticky top-0 z-50">
-    <div class="max-w-6xl mx-auto flex flex-wrap items-center justify-between gap-3">
-      <div class="flex items-center gap-3">
-        <div class="w-11 h-11 bg-[#1e3a5f] rounded-full flex items-center justify-center text-white text-[0.6rem] font-bold text-center leading-tight">INSC<br>NSC</div>
-        <div>
-          <div class="text-xs text-slate-500">Mat. Construção</div>
-          <div class="text-lg font-bold text-[#1e3a5f]">Nossa Sra. da Conceição</div>
+
+<body>
+
+  <main class="dashboard">
+
+    <!-- =====================================================
+         HEADER / TOPO
+    ====================================================== -->
+    <header class="header">
+
+      <div class="header-left">
+
+        <div class="brand">
+          <span class="brand-icon">◎</span>
+          Instagram Analytics
         </div>
+
+        <h1>Painel Profissional — Instagram Insights</h1>
+
+        <div class="period-wrapper">
+
+          <span class="period-icon">▣</span>
+
+          <span
+            id="reportPeriod"
+            contenteditable="true"
+            spellcheck="false"
+            title="Clique para editar o período"
+          >
+            2 de ago a 31 de ago
+          </span>
+
+        </div>
+
       </div>
-      <div class="flex items-center gap-2 no-print">
-        <input type="month" id="monthPicker" class="border border-slate-300 rounded-lg px-3 py-2 text-sm font-semibold text-[#1e3a5f]">
-        <button onclick="generatePDF()" class="bg-[#dd6b20] text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-[#c05621] transition">
-          <i class="fas fa-file-pdf"></i> PDF
+
+      <div class="header-actions">
+
+        <!-- Apenas visual -->
+        <button
+          class="icon-button"
+          type="button"
+          title="Configurações"
+          aria-label="Configurações"
+        >
+          ⚙
         </button>
-      </div>
-    </div>
-  </header>
 
-  <main class="max-w-6xl mx-auto p-4" id="printable">
-    <!-- Abas -->
-    <div class="flex gap-2 overflow-x-auto pb-2 mb-6 no-print" style="scrollbar-width: none;">
-      <button class="tab-btn active" onclick="switchTab('dashboard')"><i class="fas fa-chart-line"></i> Dashboard</button>
-      <button class="tab-btn" onclick="switchTab('input')"><i class="fas fa-edit"></i> Lançar Dados</button>
-    </div>
-
-    <!-- Dashboard -->
-    <div id="tab-dashboard">
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-        <div class="card p-4">
-          <div class="text-xs text-slate-500 uppercase mb-1">Impressões</div>
-          <div class="text-2xl font-bold text-[#1e3a5f]" id="dash-impressions">0</div>
-        </div>
-        <div class="card p-4">
-          <div class="text-xs text-slate-500 uppercase mb-1">Alcance</div>
-          <div class="text-2xl font-bold text-[#1e3a5f]" id="dash-reach">0</div>
-        </div>
-        <div class="card p-4">
-          <div class="text-xs text-slate-500 uppercase mb-1">Seguidores</div>
-          <div class="text-2xl font-bold text-[#1e3a5f]" id="dash-followers">0</div>
-        </div>
-        <div class="card p-4">
-          <div class="text-xs text-slate-500 uppercase mb-1">Engajamento</div>
-          <div class="text-2xl font-bold text-[#dd6b20]" id="dash-engagement">0%</div>
-        </div>
       </div>
 
-      <div class="card p-6 mb-6">
-        <h3 class="text-lg font-bold text-[#1e3a5f] mb-4">Evolução Diária</h3>
-        <div class="h-72"><canvas id="chart"></canvas></div>
+    </header>
+
+
+    <!-- =====================================================
+         INSIGHTS
+    ====================================================== -->
+    <section class="section">
+
+      <div class="section-header">
+
+        <div>
+          <h2 class="section-title">Insights</h2>
+
+          <p class="section-subtitle">
+            Principais resultados do período
+          </p>
+        </div>
+
       </div>
 
-      <div class="card p-6">
-        <h3 class="text-lg font-bold text-[#1e3a5f] mb-4">Conteúdo do Mês</h3>
-        <div class="overflow-x-auto">
-          <table class="w-full text-sm">
-            <thead><tr class="border-b border-slate-200 text-slate-500 text-left">
-              <th class="py-2">Data</th><th class="py-2">Tipo</th><th class="py-2">Tema</th>
-              <th class="py-2 text-right">❤️</th><th class="py-2 text-right">💬</th><th class="py-2 text-right">👁️</th>
-            </tr></thead>
-            <tbody id="content-table"></tbody>
-          </table>
-        </div>
-      </div>
-    </div>
 
-    <!-- Input -->
-    <div id="tab-input" class="hidden">
-      <div class="card p-6 mb-6">
-        <h3 class="text-lg font-bold text-[#1e3a5f] mb-4">📊 Métricas Diárias do Mês</h3>
-        <p class="text-sm text-slate-500 mb-4">Digite os dados do Insights do Instagram (um por dia)</p>
-        <div class="grid grid-cols-2 md:grid-cols-5 gap-3 mb-3">
-          <input type="date" id="in-date" class="border rounded-lg px-3 py-2 text-sm">
-          <input type="number" id="in-impressions" placeholder="Impressões" class="border rounded-lg px-3 py-2 text-sm">
-          <input type="number" id="in-reach" placeholder="Alcance" class="border rounded-lg px-3 py-2 text-sm">
-          <input type="number" id="in-followers" placeholder="Seguidores" class="border rounded-lg px-3 py-2 text-sm">
-          <button onclick="addDaily()" class="bg-[#1e3a5f] text-white rounded-lg text-sm font-semibold hover:bg-[#152a45]">Adicionar</button>
-        </div>
-        <div id="daily-list" class="space-y-2"></div>
+      <div class="insights-grid">
+
+        <!-- Visualizações -->
+        <article class="insight-card">
+
+          <p class="insight-label">
+            Visualizações
+          </p>
+
+          <div class="insight-value-row">
+
+            <span
+              class="insight-value"
+              contenteditable="true"
+              spellcheck="false"
+              data-save="visualizacoes"
+            >
+              526,2 mil
+            </span>
+
+            <span class="trend-up">
+              ↗
+            </span>
+
+          </div>
+
+        </article>
+
+
+        <!-- Novos seguidores -->
+        <article class="insight-card">
+
+          <p class="insight-label">
+            Novos seguidores
+          </p>
+
+          <div class="insight-value-row">
+
+            <span
+              class="insight-value"
+              contenteditable="true"
+              spellcheck="false"
+              data-save="seguidores"
+            >
+              334
+            </span>
+
+            <span class="trend-up">
+              ↗
+            </span>
+
+          </div>
+
+        </article>
+
+
+        <!-- Conteúdo compartilhado -->
+        <article class="insight-card">
+
+          <p class="insight-label">
+            Conteúdo compartilhado
+          </p>
+
+          <div class="insight-value-row">
+
+            <span
+              class="insight-value"
+              contenteditable="true"
+              spellcheck="false"
+              data-save="compartilhado"
+            >
+              310
+            </span>
+
+          </div>
+
+        </article>
+
+
+        <!-- Alcance -->
+        <article class="insight-card">
+
+          <p class="insight-label">
+            Alcance
+          </p>
+
+          <div class="insight-value-row">
+
+            <span
+              class="insight-value editable-empty"
+              contenteditable="true"
+              spellcheck="false"
+              data-save="alcance"
+            ></span>
+
+          </div>
+
+        </article>
+
       </div>
 
-      <div class="card p-6">
-        <h3 class="text-lg font-bold text-[#1e3a5f] mb-4">📱 Conteúdo Publicado</h3>
-        <div class="grid grid-cols-1 md:grid-cols-6 gap-3 mb-3">
-          <input type="date" id="c-date" class="border rounded-lg px-3 py-2 text-sm">
-          <select id="c-type" class="border rounded-lg px-3 py-2 text-sm">
-            <option value="feed">Feed</option><option value="reel">Reel</option><option value="story">Story</option><option value="carousel">Carrossel</option>
-          </select>
-          <input type="text" id="c-caption" placeholder="Tema/Legenda" class="border rounded-lg px-3 py-2 text-sm md:col-span-2">
-          <input type="number" id="c-likes" placeholder="Curtidas" class="border rounded-lg px-3 py-2 text-sm">
-          <button onclick="addContent()" class="bg-[#dd6b20] text-white rounded-lg text-sm font-semibold hover:bg-[#c05621]">Adicionar</button>
+    </section>
+
+
+    <!-- =====================================================
+         INTERAÇÕES POR TIPO DE CONTEÚDO
+    ====================================================== -->
+    <section class="section">
+
+      <div class="section-header">
+
+        <div>
+          <h2 class="section-title">
+            Interações por tipo de conteúdo
+          </h2>
+
+          <p class="section-subtitle">
+            Compare o desempenho de cada formato
+          </p>
         </div>
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-3">
-          <input type="number" id="c-comments" placeholder="Comentários" class="border rounded-lg px-3 py-2 text-sm">
-          <input type="number" id="c-views" placeholder="Visualizações" class="border rounded-lg px-3 py-2 text-sm">
-        </div>
-        <div id="content-list" class="space-y-2"></div>
+
       </div>
-    </div>
+
+
+      <div class="analytics-card">
+
+        <!-- TABS -->
+        <div class="tabs-wrapper">
+
+          <div class="tabs" role="tablist">
+
+            <button
+              class="tab active"
+              data-tab="tudo"
+              type="button"
+              role="tab"
+            >
+              Tudo
+            </button>
+
+            <button
+              class="tab"
+              data-tab="curtidas"
+              type="button"
+              role="tab"
+            >
+              Curtidas
+            </button>
+
+            <button
+              class="tab"
+              data-tab="comentarios"
+              type="button"
+              role="tab"
+            >
+              Comentários
+            </button>
+
+            <button
+              class="tab"
+              data-tab="reposts"
+              type="button"
+              role="tab"
+            >
+              Reposts
+            </button>
+
+            <button
+              class="tab"
+              data-tab="compartilhamentos"
+              type="button"
+              role="tab"
+            >
+              Compartilhamentos
+            </button>
+
+            <button
+              class="tab"
+              data-tab="salvamentos"
+              type="button"
+              role="tab"
+            >
+              Salvamentos
+            </button>
+
+            <button
+              class="tab"
+              data-tab="respostas"
+              type="button"
+              role="tab"
+            >
+              Respostas
+            </button>
+
+          </div>
+
+        </div>
+
+
+        <!-- =================================================
+             TAB: TUDO
+        ================================================== -->
+        <div
+          class="tab-panel active"
+          id="tudo"
+          role="tabpanel"
+        >
+
+          <div class="interaction-list">
+
+            <div class="interaction-item" data-value="1856">
+
+              <div class="interaction-top">
+
+                <div class="content-type">
+                  <span class="content-dot"></span>
+                  Reels
+                </div>
+
+                <span
+                  class="interaction-number"
+                  contenteditable="true"
+                  spellcheck="false"
+                  data-number
+                >
+                  1.856
+                </span>
+
+              </div>
+
+              <div class="bar-track">
+                <div class="bar-fill"></div>
+              </div>
+
+            </div>
+
+
+            <div class="interaction-item" data-value="1181">
+
+              <div class="interaction-top">
+
+                <div class="content-type">
+                  <span class="content-dot"></span>
+                  Stories
+                </div>
+
+                <span
+                  class="interaction-number"
+                  contenteditable="true"
+                  spellcheck="false"
+                  data-number
+                >
+                  1.181
+                </span>
+
+              </div>
+
+              <div class="bar-track">
+                <div class="bar-fill"></div>
+              </div>
+
+            </div>
+
+
+            <div class="interaction-item" data-value="521">
+
+              <div class="interaction-top">
+
+                <div class="content-type">
+                  <span class="content-dot"></span>
+                  Posts
+                </div>
+
+                <span
+                  class="interaction-number"
+                  contenteditable="true"
+                  spellcheck="false"
+                  data-number
+                >
+                  521
+                </span>
+
+              </div>
+
+              <div class="bar-track">
+                <div class="bar-fill"></div>
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <!-- =================================================
+             TAB: CURTIDAS
+        ================================================== -->
+        <div
+          class="tab-panel"
+          id="curtidas"
+          role="tabpanel"
+        >
+
+          <div class="interaction-list">
+
+            <div class="interaction-item" data-value="1200">
+
+              <div class="interaction-top">
+
+                <div class="content-type">
+                  <span class="content-dot"></span>
+                  Reels
+                </div>
+
+                <span
+                  class="interaction-number"
+                  contenteditable="true"
+                  spellcheck="false"
+                  data-number
+                >
+                  1,2 mil
+                </span>
+
+              </div>
+
+              <div class="bar-track">
+                <div class="bar-fill"></div>
+              </div>
+
+            </div>
+
+
+            <div class="interaction-item" data-value="688">
+
+              <div class="interaction-top">
+
+                <div class="content-type">
+                  <span class="content-dot"></span>
+                  Stories
+                </div>
+
+                <span
+                  class="interaction-number"
+                  contenteditable="true"
+                  spellcheck="false"
+                  data-number
+                >
+                  688
+                </span>
+
+              </div>
+
+              <div class="bar-track">
+                <div class="bar-fill"></div>
+              </div>
+
+            </div>
+
+
+            <div class="interaction-item" data-value="462">
+
+              <div class="interaction-top">
+
+                <div class="content-type">
+                  <span class="content-dot"></span>
+                  Posts
+                </div>
+
+                <span
+                  class="interaction-number"
+                  contenteditable="true"
+                  spellcheck="false"
+                  data-number
+                >
+                  462
+                </span>
+
+              </div>
+
+              <div class="bar-track">
+                <div class="bar-fill"></div>
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <!-- =================================================
+             TAB: COMENTÁRIOS
+        ================================================== -->
+        <div
+          class="tab-panel"
+          id="comentarios"
+          role="tabpanel"
+        >
+
+          <div class="interaction-list">
+
+            <div class="interaction-item" data-value="115">
+
+              <div class="interaction-top">
+
+                <div class="content-type">
+                  <span class="content-dot"></span>
+                  Reels
+                </div>
+
+                <span
+                  class="interaction-number"
+                  contenteditable="true"
+                  spellcheck="false"
+                  data-number
+                >
+                  115
+                </span>
+
+              </div>
+
+              <div class="bar-track">
+                <div class="bar-fill"></div>
+              </div>
+
+            </div>
+
+
+            <div class="interaction-item" data-value="22">
+
+              <div class="interaction-top">
+
+                <div class="content-type">
+                  <span class="content-dot"></span>
+                  Posts
+                </div>
+
+                <span
+                  class="interaction-number"
+                  contenteditable="true"
+                  spellcheck="false"
+                  data-number
+                >
+                  22
+                </span>
+
+              </div>
+
+              <div class="bar-track">
+                <div class="bar-fill"></div>
+              </div>
+
+            </div>
+
+
+            <div class="interaction-item" data-value="0">
+
+              <div class="interaction-top">
+
+                <div class="content-type">
+                  <span class="content-dot"></span>
+                  Stories
+                </div>
+
+                <span
+                  class="interaction-number"
+                  contenteditable="true"
+                  spellcheck="false"
+                  data-number
+                >
+                  0
+                </span>
+
+              </div>
+
+              <div class="bar-track">
+                <div class="bar-fill"></div>
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <!-- =================================================
+             TAB: REPOSTS
+        ================================================== -->
+        <div
+          class="tab-panel"
+          id="reposts"
+          role="tabpanel"
+        >
+
+          <div class="interaction-list">
+
+            <div class="interaction-item" data-value="46">
+
+              <div class="interaction-top">
+
+                <div class="content-type">
+                  <span class="content-dot"></span>
+                  Reels
+                </div>
+
+                <span
+                  class="interaction-number"
+                  contenteditable="true"
+                  spellcheck="false"
+                  data-number
+                >
+                  46
+                </span>
+
+              </div>
+
+              <div class="bar-track">
+                <div class="bar-fill"></div>
+              </div>
+
+            </div>
+
+
+            <div class="interaction-item" data-value="7">
+
+              <div class="interaction-top">
+
+                <div class="content-type">
+                  <span class="content-dot"></span>
+                  Posts
+                </div>
+
+                <span
+                  class="interaction-number"
+                  contenteditable="true"
+                  spellcheck="false"
+                  data-number
+                >
+                  7
+                </span>
+
+              </div>
+
+              <div class="bar-track">
+                <div class="bar-fill"></div>
+              </div>
+
+            </div>
+
+
+            <div class="interaction-item" data-value="0">
+
+              <div class="interaction-top">
+
+                <div class="content-type">
+                  <span class="content-dot"></span>
+                  Stories
+                </div>
+
+                <span
+                  class="interaction-number"
+                  contenteditable="true"
+                  spellcheck="false"
+                  data-number
+                >
+                  0
+                </span>
+
+              </div>
+
+              <div class="bar-track">
+                <div class="bar-fill"></div>
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <!-- =================================================
+             TAB: COMPARTILHAMENTOS
+        ================================================== -->
+        <div
+          class="tab-panel"
+          id="compartilhamentos"
+          role="tabpanel"
+        >
+
+          <div class="interaction-list">
+
+            <div class="interaction-item" data-value="246">
+
+              <div class="interaction-top">
+
+                <div class="content-type">
+                  <span class="content-dot"></span>
+                  Stories
+                </div>
+
+                <span
+                  class="interaction-number"
+                  contenteditable="true"
+                  spellcheck="false"
+                  data-number
+                >
+                  246
+                </span>
+
+              </div>
+
+              <div class="bar-track">
+                <div class="bar-fill"></div>
+              </div>
+
+            </div>
+
+
+            <div class="interaction-item" data-value="133">
+
+              <div class="interaction-top">
+
+                <div class="content-type">
+                  <span class="content-dot"></span>
+                  Reels
+                </div>
+
+                <span
+                  class="interaction-number"
+                  contenteditable="true"
+                  spellcheck="false"
+                  data-number
+                >
+                  133
+                </span>
+
+              </div>
+
+              <div class="bar-track">
+                <div class="bar-fill"></div>
+              </div>
+
+            </div>
+
+
+            <div class="interaction-item" data-value="26">
+
+              <div class="interaction-top">
+
+                <div class="content-type">
+                  <span class="content-dot"></span>
+                  Posts
+                </div>
+
+                <span
+                  class="interaction-number"
+                  contenteditable="true"
+                  spellcheck="false"
+                  data-number
+                >
+                  26
+                </span>
+
+              </div>
+
+              <div class="bar-track">
+                <div class="bar-fill"></div>
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <!-- =================================================
+             TAB: SALVAMENTOS
+        ================================================== -->
+        <div
+          class="tab-panel"
+          id="salvamentos"
+          role="tabpanel"
+        >
+
+          <div class="interaction-list">
+
+            <div class="interaction-item" data-value="21">
+
+              <div class="interaction-top">
+
+                <div class="content-type">
+                  <span class="content-dot"></span>
+                  Reels
+                </div>
+
+                <span
+                  class="interaction-number"
+                  contenteditable="true"
+                  spellcheck="false"
+                  data-number
+                >
+                  21
+                </span>
+
+              </div>
+
+              <div class="bar-track">
+                <div class="bar-fill"></div>
+              </div>
+
+            </div>
+
+
+            <div class="interaction-item" data-value="4">
+
+              <div class="interaction-top">
+
+                <div class="content-type">
+                  <span class="content-dot"></span>
+                  Posts
+                </div>
+
+                <span
+                  class="interaction-number"
+                  contenteditable="true"
+                  spellcheck="false"
+                  data-number
+                >
+                  4
+                </span>
+
+              </div>
+
+              <div class="bar-track">
+                <div class="bar-fill"></div>
+              </div>
+
+            </div>
+
+
+            <div class="interaction-item" data-value="0">
+
+              <div class="interaction-top">
+
+                <div class="content-type">
+                  <span class="content-dot"></span>
+                  Stories
+                </div>
+
+                <span
+                  class="interaction-number"
+                  contenteditable="true"
+                  spellcheck="false"
+                  data-number
+                >
+                  0
+                </span>
+
+              </div>
+
+              <div class="bar-track">
+                <div class="bar-fill"></div>
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <!-- =================================================
+             TAB: RESPOSTAS
+        ================================================== -->
+        <div
+          class="tab-panel"
+          id="respostas"
+          role="tabpanel"
+        >
+
+          <div class="interaction-list">
+
+            <div class="interaction-item" data-value="247">
+
+              <div class="interaction-top">
+
+                <div class="content-type">
+                  <span class="content-dot"></span>
+                  Stories
+                </div>
+
+                <span
+                  class="interaction-number"
+                  contenteditable="true"
+                  spellcheck="false"
+                  data-number
+                >
+                  247
+                </span>
+
+              </div>
+
+              <div class="bar-track">
+                <div class="bar-fill"></div>
+              </div>
+
+            </div>
+
+
+            <div class="interaction-item" data-value="0">
+
+              <div class="interaction-top">
+
+                <div class="content-type">
+                  <span class="content-dot"></span>
+                  Posts
+                </div>
+
+                <span
+                  class="interaction-number"
+                  contenteditable="true"
+                  spellcheck="false"
+                  data-number
+                >
+                  0
+                </span>
+
+              </div>
+
+              <div class="bar-track">
+                <div class="bar-fill"></div>
+              </div>
+
+            </div>
+
+
+            <div class="interaction-item" data-value="0">
+
+              <div class="interaction-top">
+
+                <div class="content-type">
+                  <span class="content-dot"></span>
+                  Reels
+                </div>
+
+                <span
+                  class="interaction-number"
+                  contenteditable="true"
+                  spellcheck="false"
+                  data-number
+                >
+                  0
+                </span>
+
+              </div>
+
+              <div class="bar-track">
+                <div class="bar-fill"></div>
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         ATIVIDADE DO PERFIL
+    ====================================================== -->
+    <section class="section">
+
+      <div class="section-header">
+
+        <div>
+
+          <h2 class="section-title">
+            Atividade do perfil
+          </h2>
+
+          <p class="section-subtitle">
+            Ações realizadas a partir do seu perfil
+          </p>
+
+        </div>
+
+      </div>
+
+
+      <div class="activity-card">
+
+        <!-- Visitas -->
+        <div class="activity-item">
+
+          <div class="activity-left">
+
+            <div class="activity-icon">
+              👤
+            </div>
+
+            <div>
+
+              <div class="activity-name">
+                Visitas ao perfil
+              </div>
+
+              <div class="activity-description">
+                Pessoas que acessaram seu perfil
+              </div>
+
+            </div>
+
+          </div>
+
+          <span
+            class="activity-value"
+            contenteditable="true"
+            spellcheck="false"
+            data-save="visitasPerfil"
+          >
+            2.096
+          </span>
+
+        </div>
+
+
+        <!-- Bio -->
+        <div class="activity-item">
+
+          <div class="activity-left">
+
+            <div class="activity-icon">
+              🔗
+            </div>
+
+            <div>
+
+              <div class="activity-name">
+                Toques no link da bio
+              </div>
+
+              <div class="activity-description">
+                Cliques no link do perfil
+              </div>
+
+            </div>
+
+          </div>
+
+          <span
+            class="activity-value"
+            contenteditable="true"
+            spellcheck="false"
+            data-save="linkBio"
+          >
+            399
+          </span>
+
+        </div>
+
+
+        <!-- Endereço -->
+        <div class="activity-item">
+
+          <div class="activity-left">
+
+            <div class="activity-icon">
+              🏪
+            </div>
+
+            <div>
+
+              <div class="activity-name">
+                Toques no endereço comercial
+              </div>
+
+              <div class="activity-description">
+                Acessos ao endereço informado
+              </div>
+
+            </div>
+
+          </div>
+
+          <span
+            class="activity-value"
+            contenteditable="true"
+            spellcheck="false"
+            data-save="endereco"
+          >
+            0
+          </span>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         FOOTER
+    ====================================================== -->
+    <footer class="footer">
+
+      <span class="status">
+        <span class="status-dot"></span>
+        Dados editáveis • Salvamento automático
+      </span>
+
+    </footer>
+
   </main>
 
+
   <script>
-    const state = { daily: [], content: [] };
-    let chart = null;
+    /* =========================================================
+       SISTEMA DE TABS
+    ========================================================= */
 
-    function getKey() { return 'ig_' + document.getElementById('monthPicker').value; }
+    const tabs = document.querySelectorAll(".tab");
+    const panels = document.querySelectorAll(".tab-panel");
 
-    function load() {
-      document.getElementById('monthPicker').value = new Date().toISOString().slice(0, 7);
-      const saved = localStorage.getItem(getKey());
-      if (saved) { Object.assign(state, JSON.parse(saved)); }
-      render();
-    }
+    tabs.forEach((tab) => {
 
-    function save() { localStorage.setItem(getKey(), JSON.stringify(state)); render(); }
+      tab.addEventListener("click", () => {
 
-    function switchTab(tab) {
-      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-      event.target.classList.add('active');
-      document.getElementById('tab-dashboard').classList.toggle('hidden', tab !== 'dashboard');
-      document.getElementById('tab-input').classList.toggle('hidden', tab !== 'input');
-      if (tab === 'dashboard') render();
-    }
+        const targetId = tab.dataset.tab;
 
-    function addDaily() {
-      const date = document.getElementById('in-date').value;
-      if (!date) return alert('Selecione a data');
-      state.daily.push({
-        date, impressions: +document.getElementById('in-impressions').value || 0,
-        reach: +document.getElementById('in-reach').value || 0,
-        followers: +document.getElementById('in-followers').value || 0
-      });
-      state.daily.sort((a,b) => new Date(a.date) - new Date(b.date));
-      ['in-date','in-impressions','in-reach','in-followers'].forEach(id => document.getElementById(id).value = '');
-      save();
-    }
+        /* Remove active das tabs */
+        tabs.forEach((item) => {
+          item.classList.remove("active");
+        });
 
-    function addContent() {
-      const date = document.getElementById('c-date').value;
-      if (!date) return alert('Selecione a data');
-      state.content.push({
-        date, type: document.getElementById('c-type').value,
-        caption: document.getElementById('c-caption').value,
-        likes: +document.getElementById('c-likes').value || 0,
-        comments: +document.getElementById('c-comments').value || 0,
-        views: +document.getElementById('c-views').value || 0
-      });
-      state.content.sort((a,b) => new Date(a.date) - new Date(b.date));
-      ['c-date','c-caption','c-likes','c-comments','c-views'].forEach(id => document.getElementById(id).value = '');
-      save();
-    }
+        /* Remove active dos painéis */
+        panels.forEach((panel) => {
+          panel.classList.remove("active");
+        });
 
-    function removeDaily(i) { state.daily.splice(i,1); save(); }
-    function removeContent(i) { state.content.splice(i,1); save(); }
+        /* Ativa a tab selecionada */
+        tab.classList.add("active");
 
-    function render() {
-      const totalImp = state.daily.reduce((a,d) => a + d.impressions, 0);
-      const totalReach = state.daily.reduce((a,d) => a + d.reach, 0);
-      const lastFollowers = state.daily.slice(-1)[0]?.followers || 0;
-      const totalLikes = state.content.reduce((a,c) => a + c.likes, 0);
-      const totalComments = state.content.reduce((a,c) => a + c.comments, 0);
-      const engRate = totalReach > 0 ? (((totalLikes + totalComments) / totalReach) * 100).toFixed(2) : '0.00';
+        /* Exibe somente o painel correspondente */
+        const targetPanel = document.getElementById(targetId);
 
-      document.getElementById('dash-impressions').textContent = totalImp.toLocaleString('pt-BR');
-      document.getElementById('dash-reach').textContent = totalReach.toLocaleString('pt-BR');
-      document.getElementById('dash-followers').textContent = lastFollowers.toLocaleString('pt-BR');
-      document.getElementById('dash-engagement').textContent = engRate + '%';
+        if (targetPanel) {
+          targetPanel.classList.add("active");
 
-      // Chart
-      const labels = state.daily.map(d => d.date.split('-').reverse().slice(0,2).join('/'));
-      const ctx = document.getElementById('chart').getContext('2d');
-      if (chart) chart.destroy();
-      chart = new Chart(ctx, {
-        type: 'line',
-        data: {
-          labels,
-          datasets: [
-            { label: 'Impressões', data: state.daily.map(d => d.impressions), borderColor: '#1e3a5f', backgroundColor: 'rgba(30,58,95,0.1)', fill: true, tension: 0.4 },
-            { label: 'Alcance', data: state.daily.map(d => d.reach), borderColor: '#dd6b20', backgroundColor: 'rgba(221,107,32,0.1)', fill: true, tension: 0.4 }
-          ]
-        },
-        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'top' } }, scales: { y: { beginAtZero: true } } }
+          /* Recalcula as barras */
+          updateBars(targetPanel);
+        }
+
       });
 
-      // Tables
-      document.getElementById('content-table').innerHTML = state.content.map((c,i) => `
-        <tr class="border-b border-slate-100">
-          <td class="py-2">${c.date.split('-').reverse().join('/')}</td>
-          <td class="py-2"><span class="px-2 py-0.5 rounded-full text-xs font-semibold ${c.type==='reel'?'bg-purple-100 text-purple-700':c.type==='carousel'?'bg-green-100 text-green-700':'bg-blue-100 text-blue-700'}">${c.type}</span></td>
-          <td class="py-2 max-w-xs truncate">${c.caption || '-'}</td>
-          <td class="py-2 text-right font-semibold">${c.likes}</td>
-          <td class="py-2 text-right font-semibold">${c.comments}</td>
-          <td class="py-2 text-right font-semibold">${c.views}</td>
-        </tr>
-      `).join('') || '<tr><td colspan="6" class="py-4 text-center text-slate-400">Nenhum conteúdo registrado</td></tr>';
+    });
 
-      document.getElementById('daily-list').innerHTML = state.daily.map((d,i) => `
-        <div class="flex justify-between items-center bg-slate-50 p-2 rounded-lg text-sm">
-          <span>${d.date.split('-').reverse().join('/')} — <strong>${d.impressions.toLocaleString('pt-BR')}</strong> imp. / <strong>${d.reach.toLocaleString('pt-BR')}</strong> alc.</span>
-          <button onclick="removeDaily(${i})" class="text-red-500 hover:text-red-700"><i class="fas fa-trash"></i></button>
-        </div>
-      `).join('');
 
-      document.getElementById('content-list').innerHTML = state.content.map((c,i) => `
-        <div class="flex justify-between items-center bg-slate-50 p-2 rounded-lg text-sm">
-          <span>${c.date.split('-').reverse().join('/')} — ${c.type} — ${c.caption || '(sem legenda)'}</span>
-          <button onclick="removeContent(${i})" class="text-red-500 hover:text-red-700"><i class="fas fa-trash"></i></button>
-        </div>
-      `).join('');
+    /* =========================================================
+       BARRAS PROPORCIONAIS
+    ========================================================= */
+
+    function parseNumber(value) {
+
+      if (!value) {
+        return 0;
+      }
+
+      let text = String(value)
+        .trim()
+        .toLowerCase()
+        .replace(/\s/g, "");
+
+      /* Trata "1,2 mil" */
+      if (text.includes("mil")) {
+
+        text = text
+          .replace("mil", "")
+          .replace(/\./g, "")
+          .replace(",", ".");
+
+        const number = parseFloat(text);
+
+        return Number.isNaN(number)
+          ? 0
+          : number * 1000;
+      }
+
+      /* Remove separadores utilizados em números */
+      text = text.replace(/\./g, "").replace(",", ".");
+
+      const number = parseFloat(text);
+
+      return Number.isNaN(number)
+        ? 0
+        : number;
     }
 
-    function generatePDF() {
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF();
-      const month = document.getElementById('monthPicker').value;
-      doc.setFontSize(18); doc.text('Relatório Instagram — N. Sra. da Conceição', 14, 20);
-      doc.setFontSize(11); doc.setTextColor(100);
-      doc.text(`Período: ${month}`, 14, 28);
-      doc.text(`Gerado em: ${new Date().toLocaleDateString('pt-BR')}`, 14, 34);
-      doc.setTextColor(30, 58, 95); doc.setFontSize(14); doc.text('Resumo do Mês', 14, 48);
-      doc.setFontSize(11);
-      doc.text(`Impressões: ${document.getElementById('dash-impressions').textContent}`, 14, 58);
-      doc.text(`Alcance: ${document.getElementById('dash-reach').textContent}`, 14, 65);
-      doc.text(`Seguidores: ${document.getElementById('dash-followers').textContent}`, 14, 72);
-      doc.text(`Taxa de Engajamento: ${document.getElementById('dash-engagement').textContent}`, 14, 79);
-      doc.save(`relatorio-instagram-${month}.pdf`);
+
+    function updateBars(panel) {
+
+      if (!panel) {
+        return;
+      }
+
+      const items = panel.querySelectorAll(
+        ".interaction-item"
+      );
+
+      if (!items.length) {
+        return;
+      }
+
+      /*
+        Obtém o valor atual diretamente do texto editável.
+        Dessa forma, caso o usuário altere um número,
+        a barra também acompanha a alteração.
+      */
+
+      const values = [...items].map((item) => {
+
+        const numberElement =
+          item.querySelector("[data-number]");
+
+        return parseNumber(
+          numberElement?.textContent || "0"
+        );
+
+      });
+
+      const maxValue = Math.max(...values);
+
+      items.forEach((item, index) => {
+
+        const value = values[index];
+
+        const percentage =
+          maxValue > 0
+            ? (value / maxValue) * 100
+            : 0;
+
+        const bar =
+          item.querySelector(".bar-fill");
+
+        if (bar) {
+          bar.style.width = `${percentage}%`;
+        }
+
+        /*
+          Mantém o valor no dataset para futuras utilizações.
+        */
+        item.dataset.value = value;
+
+      });
+
     }
 
-    document.getElementById('monthPicker').addEventListener('change', load);
-    load();
+
+    /* =========================================================
+       ATUALIZAÇÃO DAS BARRAS QUANDO O USUÁRIO EDITAR
+    ========================================================= */
+
+    document
+      .querySelectorAll("[data-number]")
+      .forEach((element) => {
+
+        element.addEventListener("input", () => {
+
+          const panel =
+            element.closest(".tab-panel");
+
+          updateBars(panel);
+
+          saveDashboard();
+
+        });
+
+      });
+
+
+    /* =========================================================
+       LOCAL STORAGE
+       Salva os dados editáveis automaticamente
+    ========================================================= */
+
+    const savedElements = document.querySelectorAll(
+      "[data-save]"
+    );
+
+    function saveDashboard() {
+
+      const data = {};
+
+      savedElements.forEach((element) => {
+
+        const key =
+          element.dataset.save;
+
+        data[key] =
+          element.innerText;
+
+      });
+
+      const period =
+        document.getElementById("reportPeriod");
+
+      if (period) {
+        data.period =
+          period.innerText;
+      }
+
+      /*
+        Salva também os valores das interações.
+      */
+
+      const interactionValues = [];
+
+      document
+        .querySelectorAll("[data-number]")
+        .forEach((element) => {
+
+          interactionValues.push(
+            element.innerText
+          );
+
+        });
+
+      data.interactions =
+        interactionValues;
+
+      localStorage.setItem(
+        "instagram-dashboard-data",
+        JSON.stringify(data)
+      );
+
+    }
+
+
+    /* =========================================================
+       CARREGAMENTO DOS DADOS SALVOS
+    ========================================================= */
+
+    function loadDashboard() {
+
+      const saved =
+        localStorage.getItem(
+          "instagram-dashboard-data"
+        );
+
+      if (!saved) {
+        return;
+      }
+
+      try {
+
+        const data =
+          JSON.parse(saved);
+
+        /*
+          Campos principais
+        */
+
+        savedElements.forEach((element) => {
+
+          const key =
+            element.dataset.save;
+
+          if (
+            data[key] !== undefined
+          ) {
+
+            element.innerText =
+              data[key];
+
+          }
+
+        });
+
+
+        /*
+          Período
+        */
+
+        const period =
+          document.getElementById("reportPeriod");
+
+        if (
+          period &&
+          data.period !== undefined
+        ) {
+
+          period.innerText =
+            data.period;
+
+        }
+
+
+        /*
+          Interações
+        */
+
+        if (
+          Array.isArray(data.interactions)
+        ) {
+
+          const interactionElements =
+            document.querySelectorAll(
+              "[data-number]"
+            );
+
+          interactionElements.forEach(
+            (element, index) => {
+
+              if (
+                data.interactions[index] !== undefined
+              ) {
+
+                element.innerText =
+                  data.interactions[index];
+
+              }
+
+            }
+          );
+
+        }
+
+      } catch (error) {
+
+        console.error(
+          "Erro ao carregar os dados:",
+          error
+        );
+
+      }
+
+    }
+
+
+    /* =========================================================
+       SALVAR ALTERAÇÕES DE TEXTO
+    ========================================================= */
+
+    document
+      .querySelectorAll('[contenteditable="true"]')
+      .forEach((element) => {
+
+        element.addEventListener(
+          "input",
+          saveDashboard
+        );
+
+        /*
+          Impede que Enter crie várias linhas.
+        */
+        element.addEventListener(
+          "keydown",
+          (event) => {
+
+            if (event.key === "Enter") {
+
+              event.preventDefault();
+
+              element.blur();
+
+            }
+
+          }
+        );
+
+      });
+
+
+    /* =========================================================
+       INICIALIZAÇÃO
+    ========================================================= */
+
+    document.addEventListener(
+      "DOMContentLoaded",
+      () => {
+
+        loadDashboard();
+
+        /*
+          Calcula as barras de todas as tabs.
+        */
+
+        panels.forEach((panel) => {
+
+          updateBars(panel);
+
+        });
+
+      }
+    );
+
   </script>
+
 </body>
 </html>
