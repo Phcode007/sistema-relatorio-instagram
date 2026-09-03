@@ -2012,438 +2012,341 @@
   </main>
 
 
-  <script>
-    /* =========================================================
-       TABS
-    ========================================================= */
+<script>
+  async function exportarPDF() {
 
-    const tabs =
-      document.querySelectorAll(".tab");
+    const dashboard =
+      document.querySelector(".dashboard");
 
-    const panels =
-      document.querySelectorAll(".tab-panel");
+    if (!dashboard) {
+      alert("Dashboard não encontrado.");
+      return;
+    }
 
+    // Salva as alterações antes de gerar o PDF
+    saveDashboard();
 
-    tabs.forEach((tab) => {
+    // Guarda o elemento atualmente focado
+    const activeElement = document.activeElement;
 
-      tab.addEventListener("click", () => {
+    if (activeElement) {
+      activeElement.blur();
+    }
 
-        const targetId =
-          tab.dataset.tab;
+    // Esconde elementos que não devem aparecer no PDF
+    const elementsToHide = document.querySelectorAll(
+      ".pdf-button, .icon-button, .footer"
+    );
 
-        tabs.forEach((item) => {
-
-          item.classList.remove("active");
-
-        });
-
-        panels.forEach((panel) => {
-
-          panel.classList.remove("active");
-
-        });
-
-        tab.classList.add("active");
-
-        const targetPanel =
-          document.getElementById(targetId);
-
-        if (targetPanel) {
-
-          targetPanel.classList.add("active");
-
-          updateBars(targetPanel);
-
-        }
-
-      });
-
+    elementsToHide.forEach((element) => {
+      element.style.visibility = "hidden";
     });
 
+    try {
 
-    /* =========================================================
-       CONVERSÃO DE NÚMEROS
-    ========================================================= */
+      /*
+       * Captura o dashboard INTEIRO.
+       *
+       * O ponto importante aqui é:
+       * windowWidth / windowHeight usam
+       * as dimensões completas do dashboard,
+       * e não apenas o viewport.
+       */
+      const canvas = await html2canvas(dashboard, {
 
-    function parseNumber(value) {
+        scale: 2,
 
-      if (!value) {
-        return 0;
-      }
+        useCORS: true,
 
-      let text =
-        String(value)
-          .trim()
-          .toLowerCase()
-          .replace(/\s/g, "");
+        backgroundColor: "#0F0F13",
 
-      /* Exemplo: 1,2 mil */
-      if (text.includes("mil")) {
+        logging: false,
 
-        text =
-          text
-            .replace("mil", "")
-            .replace(/\./g, "")
-            .replace(",", ".");
+        width: dashboard.scrollWidth,
 
-        const number =
-          parseFloat(text);
+        height: dashboard.scrollHeight,
 
-        return Number.isNaN(number)
-          ? 0
-          : number * 1000;
+        windowWidth: dashboard.scrollWidth,
 
-      }
+        windowHeight: dashboard.scrollHeight,
 
-      text =
-        text
-          .replace(/\./g, "")
-          .replace(",", ".");
+        scrollX: 0,
 
-      const number =
-        parseFloat(text);
+        scrollY: 0,
 
-      return Number.isNaN(number)
-        ? 0
-        : number;
-    }
+        onclone: (clonedDocument) => {
 
+          const clonedDashboard =
+            clonedDocument.querySelector(".dashboard");
 
-    /* =========================================================
-       ATUALIZAÇÃO DAS BARRAS
-    ========================================================= */
+          if (clonedDashboard) {
 
-    function updateBars(panel) {
+            clonedDashboard.style.width =
+              `${dashboard.scrollWidth}px`;
 
-      if (!panel) {
-        return;
-      }
+            clonedDashboard.style.maxWidth =
+              "none";
+          }
 
-      const items =
-        panel.querySelectorAll(
-          ".interaction-item"
-        );
+          /*
+           * Remove o foco dos campos editáveis
+           * durante a captura.
+           */
+          clonedDocument
+            .querySelectorAll('[contenteditable="true"]')
+            .forEach((element) => {
 
-      if (!items.length) {
-        return;
-      }
+              element.blur();
 
-      const values =
-        [...items].map((item) => {
+              element.style.boxShadow =
+                "none";
 
-          const numberElement =
-            item.querySelector(
-              "[data-number]"
-            );
+              element.style.background =
+                "transparent";
 
-          return parseNumber(
-            numberElement?.textContent || "0"
-          );
-
-        });
-
-      const maxValue =
-        Math.max(...values);
-
-      items.forEach((item, index) => {
-
-        const value =
-          values[index];
-
-        const percentage =
-          maxValue > 0
-            ? (value / maxValue) * 100
-            : 0;
-
-        const bar =
-          item.querySelector(".bar-fill");
-
-        if (bar) {
-
-          bar.style.width =
-            `${percentage}%`;
+            });
 
         }
 
       });
 
-    }
+
+      /*
+       * Cria o PDF A4.
+       */
+      const { jsPDF } = window.jspdf;
+
+      const pdf = new jsPDF({
+
+        orientation: "portrait",
+
+        unit: "mm",
+
+        format: "a4",
+
+        compress: true
+
+      });
 
 
-    /* =========================================================
-       ATUALIZA BARRAS AO EDITAR
-    ========================================================= */
+      const pageWidth = 210;
 
-    document
-      .querySelectorAll("[data-number]")
-      .forEach((element) => {
+      const pageHeight = 297;
 
-        element.addEventListener(
-          "input",
-          () => {
+      const margin = 8;
 
-            const panel =
-              element.closest(".tab-panel");
+      const usableWidth =
+        pageWidth - margin * 2;
 
-            updateBars(panel);
+      const usableHeight =
+        pageHeight - margin * 2;
 
-            saveDashboard();
 
-          }
+      /*
+       * Converte a imagem inteira
+       * para a largura útil do A4.
+       */
+      const imageWidth =
+        usableWidth;
+
+      const imageHeight =
+        (canvas.height * imageWidth) /
+        canvas.width;
+
+
+      /*
+       * Altura que corresponde a uma página A4
+       * dentro do canvas.
+       */
+      const pageCanvasHeight =
+        Math.floor(
+          (canvas.width * usableHeight) /
+          usableWidth
         );
 
-      });
+
+      let sourceY = 0;
+
+      let pageNumber = 0;
 
 
-    /* =========================================================
-       LOCAL STORAGE
-    ========================================================= */
+      /*
+       * Divide o canvas grande em pedaços.
+       *
+       * Cada pedaço vira uma página A4.
+       */
+      while (sourceY < canvas.height) {
 
-    const savedElements =
-      document.querySelectorAll(
-        "[data-save]"
-      );
+        const remainingHeight =
+          canvas.height - sourceY;
 
-
-    function saveDashboard() {
-
-      const data = {};
-
-      savedElements.forEach((element) => {
-
-        const key =
-          element.dataset.save;
-
-        data[key] =
-          element.innerText;
-
-      });
+        const sliceHeight =
+          Math.min(
+            pageCanvasHeight,
+            remainingHeight
+          );
 
 
-      const period =
+        /*
+         * Canvas temporário para
+         * uma página.
+         */
+        const pageCanvas =
+          document.createElement("canvas");
+
+        pageCanvas.width =
+          canvas.width;
+
+        pageCanvas.height =
+          sliceHeight;
+
+
+        const context =
+          pageCanvas.getContext("2d");
+
+        context.fillStyle =
+          "#0F0F13";
+
+        context.fillRect(
+          0,
+          0,
+          pageCanvas.width,
+          pageCanvas.height
+        );
+
+
+        /*
+         * Copia apenas o pedaço
+         * correspondente à página atual.
+         */
+        context.drawImage(
+
+          canvas,
+
+          0,
+          sourceY,
+
+          canvas.width,
+          sliceHeight,
+
+          0,
+          0,
+
+          canvas.width,
+          sliceHeight
+
+        );
+
+
+        const imageData =
+          pageCanvas.toDataURL(
+            "image/jpeg",
+            0.95
+          );
+
+
+        /*
+         * Calcula a altura proporcional
+         * da página atual.
+         */
+        const currentImageHeight =
+          (sliceHeight * imageWidth) /
+          canvas.width;
+
+
+        if (pageNumber > 0) {
+
+          pdf.addPage();
+
+        }
+
+
+        pdf.addImage(
+
+          imageData,
+
+          "JPEG",
+
+          margin,
+
+          margin,
+
+          imageWidth,
+
+          currentImageHeight,
+
+          undefined,
+
+          "FAST"
+
+        );
+
+
+        sourceY += sliceHeight;
+
+        pageNumber++;
+
+      }
+
+
+      /*
+       * Nome automático do arquivo.
+       */
+      const periodElement =
         document.getElementById(
           "reportPeriod"
         );
 
-      if (period) {
-
-        data.period =
-          period.innerText;
-
-      }
+      let period =
+        periodElement
+          ? periodElement.innerText.trim()
+          : "periodo";
 
 
-      const interactionValues = [];
-
-      document
-        .querySelectorAll("[data-number]")
-        .forEach((element) => {
-
-          interactionValues.push(
-            element.innerText
-          );
-
-        });
+      /*
+       * Remove caracteres problemáticos
+       * do nome do arquivo.
+       */
+      period =
+        period
+          .replace(/[\\/:*?"<>|]/g, "-")
+          .replace(/\s+/g, "-");
 
 
-      data.interactions =
-        interactionValues;
-
-
-      localStorage.setItem(
-        "instagram-dashboard-data",
-        JSON.stringify(data)
+      pdf.save(
+        `instagram-insights-${period}.pdf`
       );
 
-    }
+
+    } catch (error) {
+
+      console.error(
+        "Erro ao gerar PDF:",
+        error
+      );
+
+      alert(
+        "Não foi possível gerar o PDF. " +
+        "Verifique o console do navegador."
+      );
 
 
-    /* =========================================================
-       CARREGAMENTO
-    ========================================================= */
+    } finally {
 
-    function loadDashboard() {
+      /*
+       * Restaura os elementos escondidos.
+       */
+      elementsToHide.forEach((element) => {
 
-      const saved =
-        localStorage.getItem(
-          "instagram-dashboard-data"
-        );
-
-      if (!saved) {
-        return;
-      }
-
-      try {
-
-        const data =
-          JSON.parse(saved);
-
-
-        savedElements.forEach(
-          (element) => {
-
-            const key =
-              element.dataset.save;
-
-            if (
-              data[key] !== undefined
-            ) {
-
-              element.innerText =
-                data[key];
-
-            }
-
-          }
-        );
-
-
-        const period =
-          document.getElementById(
-            "reportPeriod"
-          );
-
-        if (
-          period &&
-          data.period !== undefined
-        ) {
-
-          period.innerText =
-            data.period;
-
-        }
-
-
-        if (
-          Array.isArray(
-            data.interactions
-          )
-        ) {
-
-          const interactionElements =
-            document.querySelectorAll(
-              "[data-number]"
-            );
-
-          interactionElements.forEach(
-            (element, index) => {
-
-              if (
-                data.interactions[index]
-                !== undefined
-              ) {
-
-                element.innerText =
-                  data.interactions[index];
-
-              }
-
-            }
-          );
-
-        }
-
-      } catch (error) {
-
-        console.error(
-          "Erro ao carregar dados:",
-          error
-        );
-
-      }
-
-    }
-
-
-    /* =========================================================
-       EVENTOS DE EDIÇÃO
-    ========================================================= */
-
-    document
-      .querySelectorAll(
-        '[contenteditable="true"]'
-      )
-      .forEach((element) => {
-
-        element.addEventListener(
-          "input",
-          saveDashboard
-        );
-
-
-        /*
-          ENTER não cria novas linhas.
-        */
-
-        element.addEventListener(
-          "keydown",
-          (event) => {
-
-            if (
-              event.key === "Enter"
-            ) {
-
-              event.preventDefault();
-
-              element.blur();
-
-            }
-
-          }
-        );
+        element.style.visibility =
+          "";
 
       });
 
-
-    /* =========================================================
-       EXPORTAR PDF
-    ========================================================= */
-
-    function exportarPDF() {
-
-      /*
-        Garante que os dados digitados
-        estejam salvos antes da impressão.
-      */
-
-      saveDashboard();
-
-      /*
-        A API de impressão do navegador
-        permite escolher "Salvar como PDF".
-      */
-
-      window.print();
-
     }
 
-
-    /* =========================================================
-       INICIALIZAÇÃO
-    ========================================================= */
-
-    document.addEventListener(
-      "DOMContentLoaded",
-      () => {
-
-        loadDashboard();
-
-
-        /*
-          Inicializa as barras de todas
-          as categorias.
-        */
-
-        panels.forEach((panel) => {
-
-          updateBars(panel);
-
-        });
-
-      }
-    );
-
-  </script>
+  }
+</script>
 
 </body>
 </html>
