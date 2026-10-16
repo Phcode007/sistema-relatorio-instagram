@@ -904,6 +904,9 @@
       }
     }
   </style>
+  <!-- Bibliotecas usadas na exportação de PDF -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 
 <body>
@@ -2011,6 +2014,70 @@
 
   </main>
 
+
+<script>
+  /* ============================================================
+     PERSISTÊNCIA (localStorage)
+     Cada campo editável recebe uma chave: data-save, se existir,
+     ou "campo-N" (posição do campo na página).
+     ============================================================ */
+  const STORAGE_KEY = "instagram-insights-dashboard:v1";
+
+  function getEditableFields() {
+    return Array.from(
+      document.querySelectorAll('[contenteditable="true"]')
+    );
+  }
+
+  function getFieldKey(element, index) {
+    return element.id || element.dataset.save || `campo-${index}`;
+  }
+
+  function saveDashboard() {
+    try {
+      const data = {};
+      getEditableFields().forEach((element, index) => {
+        data[getFieldKey(element, index)] = element.innerText.trim();
+      });
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    } catch (error) {
+      console.warn("Não foi possível salvar os dados:", error);
+    }
+  }
+
+  function loadDashboard() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return;
+      const data = JSON.parse(raw);
+      getEditableFields().forEach((element, index) => {
+        const key = getFieldKey(element, index);
+        if (typeof data[key] === "string" && data[key] !== "") {
+          element.innerText = data[key];
+        }
+      });
+    } catch (error) {
+      console.warn("Não foi possível carregar os dados:", error);
+    }
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    loadDashboard();
+
+    let timer;
+    const agendarSalvamento = () => {
+      clearTimeout(timer);
+      timer = setTimeout(saveDashboard, 300);
+    };
+
+    getEditableFields().forEach((element) => {
+      element.addEventListener("input", agendarSalvamento);
+      element.addEventListener("blur", saveDashboard);
+    });
+
+    window.addEventListener("beforeunload", saveDashboard);
+  });
+</script>
 
 <script>
   async function exportarPDF() {
